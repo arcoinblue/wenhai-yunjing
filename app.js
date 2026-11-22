@@ -50,7 +50,7 @@ fetch('data/wenhai.json').then(r => r.json()).then(d => {
     sel_.appendChild(o);
   });
   sel_.onchange = () => go(+sel_.value);
-  $('#optFanqie').onchange = $('#optMiyake').onchange = () => { saveOpts(); render(); };
+  $('#optFanqie').onchange = $('#optGhc').onchange = $('#optMiyake').onchange = () => { saveOpts(); render(); };
   loadOpts();
   $('#q').oninput = search;
   window.onhashchange = fromHash;
@@ -65,11 +65,11 @@ fetch('data/wenhai.json').then(r => r.json()).then(d => {
 function loadOpts() {
   try {
     const o = JSON.parse(localStorage.getItem('wyj-opts') || '{}');
-    $('#optFanqie').checked = !!o.fq; $('#optMiyake').checked = !!o.rd;
+    $('#optFanqie').checked = !!o.fq; $('#optGhc').checked = !!o.gh; $('#optMiyake').checked = !!o.rd;
   } catch (e) { /* storage unavailable */ }
 }
 function saveOpts() {
-  try { localStorage.setItem('wyj-opts', JSON.stringify({ fq: $('#optFanqie').checked, rd: $('#optMiyake').checked })); }
+  try { localStorage.setItem('wyj-opts', JSON.stringify({ fq: $('#optFanqie').checked, gh: $('#optGhc').checked, rd: $('#optMiyake').checked })); }
   catch (e) { /* ignore */ }
 }
 
@@ -108,7 +108,7 @@ function isGroupStart(i) { return i === 0 || DISPLAY[i - 1][1] !== DISPLAY[i][1]
 
 function render() {
   const C = D.charts[cur - 1];
-  const fq = $('#optFanqie').checked, rd = $('#optMiyake').checked;
+  const fq = $('#optFanqie').checked, gh = $('#optGhc').checked, rd = $('#optMiyake').checked;
   const T = [];
   // header row 1: nav + 九音 names
   T.push('<thead><tr>');
@@ -145,6 +145,7 @@ function render() {
           const g = D.groups[ids[0]];
           inner = `<span class="ch">${esc(g.rep)}</span>`;
           if (fq) inner += `<span class="fq">${esc(speller(g.fanqie))}</span>`;
+          if (gh) inner += `<span class="rd">${esc(g.ghc)}</span>`;
           if (rd) inner += `<span class="rd">${esc(reading(g.miyake))}</span>`;
           if (ids.length > 1) inner += `<span class="badge">${ids.length}</span>`;
         } else inner = '<span class="o"></span>';
@@ -167,10 +168,11 @@ const speller = f => { const a = chars(f.replace(/\s/g, '')); const i = a.indexO
 const reading = cx => (cx || '').replace(/^\d/, '').replace(/\d$/, '');
 
 // ---- panel --------------------------------------------------------------
-function readingOf(ch) {
+function readingOf(ch) {   // GHC first; Miyake only if GHC is missing
   const hits = charIndex[ch];
   if (!hits) return '';
-  return [...new Set(hits.map(h => h.m.miyake).filter(Boolean))].join(', ');
+  const g = [...new Set(hits.map(h => h.m.ghc).filter(Boolean))];
+  return (g.length ? g : [...new Set(hits.map(h => h.m.miyake).filter(Boolean))]).join(', ');
 }
 function fanqieHTML(f) {
   if (!f) return '<span style="color:#888">—</span>';
@@ -191,18 +193,18 @@ function cardHTML(id, idx, total) {
   const tag = g.shown ? '<span class="tag">in chart</span>' : '<span class="tag hid">not shown</span>';
   const rows = g.m.map((m, i) => `<tr class="${m.flag ? 'warn' : ''}" title="${esc(m.flag)}">
       <td class="n">${i + 1}</td><td class="tg">${esc(m.c)}</td><td>${esc(m.lfw)}</td>
-      <td>${esc(m.pos)}</td><td>${esc(m.miyake)}</td><td>${esc(m.ghc)}</td></tr>`).join('');
+      <td>${esc(m.pos)}</td><td>${esc(m.ghc)}</td><td>${esc(m.miyake)}</td></tr>`).join('');
   return `<div class="card">
     <div class="card-h"><span class="big">${esc(g.rep)}</span>
       <div class="info">小韻 ${idx} / ${total} ${tag}<br>Wenhai ${esc(g.pos)} · ${esc(g.part)}</div></div>
     <dl class="kv">
       <dt>Fanqie</dt><dd>${fanqieHTML(g.fanqie)}</dd>
       <dt>Rhyme</dt><dd>${rhymeLine(g)}</dd>
-      <dt>Miyake</dt><dd>${esc(g.miyake)}</dd>
       <dt>GHC</dt><dd>${esc(g.ghc)}</dd>
+      <dt>Miyake</dt><dd>${esc(g.miyake)}</dd>
       <dt>Characters</dt><dd>${g.m.length}</dd>
     </dl>
-    <table class="mem"><thead><tr><th></th><th>字</th><th>LFW</th><th>Wenhai</th><th>Miyake</th><th>GHC</th></tr></thead>
+    <table class="mem"><thead><tr><th></th><th>字</th><th>LFW</th><th>Wenhai</th><th>GHC</th><th>Miyake</th></tr></thead>
       <tbody>${rows}</tbody></table>
     ${g.flag ? `<div class="flag">⚠ ${esc(g.flag)}</div>` : ''}
   </div>`;
@@ -277,7 +279,7 @@ function search() {
     const g = D.groups[id];
     const li = document.createElement('li');
     const where = g.chart ? `chart ${g.chart} · ${SECTIONS[g.sec]} · ${DENG[g.deng]} · ${COLMAP[g.col][3]}${g.shown ? '' : ' (not shown)'}` : 'not placed';
-    li.innerHTML = `<span class="tg">${esc(m.c)}</span><span class="meta">${esc(m.miyake)} · ${esc(m.ghc)} · ${esc(m.pos)}<br>${where}</span>`;
+    li.innerHTML = `<span class="tg">${esc(m.c)}</span><span class="meta">${esc(m.ghc)} · ${esc(m.miyake)} · ${esc(m.pos)}<br>${where}</span>`;
     if (g.chart) li.onclick = () => go(g.chart, { type: 'cell', key: `${g.sec}-${g.deng}-${g.col}` });
     ul.appendChild(li);
   });
