@@ -38,7 +38,7 @@ const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '
 const chars = s => Array.from(s || '');
 
 // ---- load ---------------------------------------------------------------
-fetch('data/wenhai.json?v=4').then(r => r.json()).then(d => {
+fetch('data/wenhai.json?v=6').then(r => r.json()).then(d => {
   D = d;
   charIndex = {};
   for (const [id, g] of Object.entries(D.groups))
@@ -51,6 +51,7 @@ fetch('data/wenhai.json?v=4').then(r => r.json()).then(d => {
   });
   sel_.onchange = () => go(+sel_.value);
   ['#optFanqie', '#optGhc', '#optMb', '#optMiyake', '#optFinal'].forEach(id => $(id).onchange = () => { saveOpts(); render(); });
+  document.querySelectorAll('input[name=lang]').forEach(r => r.onchange = () => { saveOpts(); showPanel(); search(); });
   loadOpts();
   $('#q').oninput = search;
   window.onhashchange = fromHash;
@@ -67,11 +68,12 @@ function loadOpts() {
     const o = JSON.parse(localStorage.getItem('wyj-opts') || '{}');
     $('#optFanqie').checked = !!o.fq; $('#optGhc').checked = !!o.gh; $('#optMb').checked = !!o.mb;
     $('#optMiyake').checked = !!o.rd; $('#optFinal').checked = o.rf !== false;
+    const l = document.querySelector(`input[name=lang][value=${o.lang === 'zh' ? 'zh' : 'en'}]`); if (l) l.checked = true;
   } catch (e) { /* storage unavailable */ }
 }
 function saveOpts() {
   try { localStorage.setItem('wyj-opts', JSON.stringify({ fq: $('#optFanqie').checked, gh: $('#optGhc').checked, mb: $('#optMb').checked,
-    rd: $('#optMiyake').checked, rf: $('#optFinal').checked })); }
+    rd: $('#optMiyake').checked, rf: $('#optFinal').checked, lang: LANG() })); }
   catch (e) { /* ignore */ }
 }
 
@@ -168,13 +170,15 @@ function render() {
   t.querySelectorAll('[data-row]').forEach(el => el.onclick = () => { sel = { type: 'row', key: el.dataset.row }; setHash(); render(); showPanel(); });
 }
 
+const LANG = () => (document.querySelector('input[name=lang]:checked') || {}).value || 'en';
+const gloss = m => (LANG() === 'zh' ? (m.zh || m.en) : (m.en || m.zh)) || '';
 const speller = f => { const a = chars(f.replace(/\s/g, '')); const i = a.indexOf('𘈖'); return (i > 0 ? a.slice(0, i) : a.slice(0, 2)).join(''); };
 const reading = cx => (cx || '').replace(/^\d/, '').replace(/\d$/, '');
 
 // ---- panel --------------------------------------------------------------
 function readingOf(ch) {   // GHC first; Miyake only if GHC is missing
   const hits = charIndex[ch];
-  if (!hits) return '';
+  if (!hits) return (D.spell && D.spell[ch]) || '';
   for (const k of ['ghc', 'mb', 'miyake']) {
     const v = [...new Set(hits.map(h => h.m[k]).filter(Boolean))];
     if (v.length) return v.join(', ');
@@ -199,12 +203,18 @@ function rhymeLine(g) {
 function cardHTML(id, idx, total) {
   const g = D.groups[id];
   const tag = g.shown ? '<span class="tag">in chart</span>' : '<span class="tag hid">not shown</span>';
-  const rows = g.m.map((m, i) => `<tr class="${m.flag ? 'warn' : ''}" title="${esc(m.flag)}">
-      <td class="n">${i + 1}</td><td class="tg">${esc(m.c)}</td><td>${esc(m.lfw)}</td>
-      <td>${esc(m.pos)}</td><td>${esc(m.ghc)}</td><td>${esc(m.mb)}</td><td>${esc(m.miyake)}</td></tr>`).join('');
+  const rows = g.m.map((m, i) => {
+    const diff = m.ghc !== g.ghc || m.miyake !== g.miyake;
+    const tip = `GHC ${m.ghc} · MB ${m.mb} · Miyake ${m.miyake}${m.flag ? ' · ' + m.flag : ''}`;
+    return `<tr class="${diff ? 'warn' : ''}" title="${esc(tip)}">
+      <td class="n">${i + 1}</td><td class="tg">${esc(m.c)}</td>
+      <td class="gl">${esc(gloss(m)) || '<span class="muted">—</span>'}${diff ? `<span class="rdiff">GHC ${esc(m.ghc)} · Miyake ${esc(m.miyake)}</span>` : ''}</td>
+      <td class="lfw">${esc(m.lfw)}<br><span class="muted">${esc(m.pos)}</span></td></tr>`;
+  }).join('');
   return `<div class="card">
     <div class="card-h"><span class="big">${esc(g.rep)}</span>
-      <div class="info">小韻 ${idx} / ${total} ${tag}<br>Wenhai ${esc(g.pos)} · ${esc(g.part)}</div></div>
+      <div class="info">小韻 ${idx} / ${total} ${tag}<br>Wenhai ${esc(g.pos)} · ${esc(g.part)}
+        ${gloss(g.m[0]) ? `<br><span class="hgl">${esc(gloss(g.m.find(m => m.c === g.rep) || g.m[0]))}</span>` : ''}</div></div>
     <dl class="kv">
       <dt>Fanqie</dt><dd>${fanqieHTML(g.fanqie)}</dd>
       <dt>Rhyme</dt><dd>${rhymeLine(g)}</dd>
@@ -213,7 +223,7 @@ function cardHTML(id, idx, total) {
       <dt>Miyake</dt><dd>${esc(g.miyake)}</dd>
       <dt>Characters</dt><dd>${g.m.length}</dd>
     </dl>
-    <table class="mem"><thead><tr><th></th><th>字</th><th>LFW</th><th>Wenhai</th><th>GHC</th><th>MB</th><th>Miyake</th></tr></thead>
+    <table class="mem"><thead><tr><th></th><th>字</th><th>${LANG() === 'zh' ? '字義' : 'Meaning'}</th><th>LFW · Wenhai</th></tr></thead>
       <tbody>${rows}</tbody></table>
     ${g.flag ? `<div class="flag">⚠ ${esc(g.flag)}</div>` : ''}
   </div>`;
@@ -289,11 +299,17 @@ function search() {
       }
     }
   }
+  if (!hits.size && !tg.length && q.length >= 2) {
+    const ql = q.toLowerCase();
+    for (const [id, g] of Object.entries(D.groups))
+      for (const m of g.m)
+        if ((m.en && m.en.toLowerCase().includes(ql)) || (m.zh && m.zh.includes(q))) { add(+id, m); break; }
+  }
   [...hits].slice(0, 80).forEach(([id, m]) => {
     const g = D.groups[id];
     const li = document.createElement('li');
     const where = g.chart ? `chart ${g.chart} · ${SECTIONS[g.sec]} · ${DENG[g.deng]} · ${COLMAP[g.col][3]}${g.shown ? '' : ' (not shown)'}` : 'not placed';
-    li.innerHTML = `<span class="tg">${esc(m.c)}</span><span class="meta">${esc(m.ghc)} · ${esc(m.mb)} · ${esc(m.miyake)} · ${esc(m.pos)}<br>${where}</span>`;
+    li.innerHTML = `<span class="tg">${esc(m.c)}</span><span class="meta">${esc(m.ghc)} · ${esc(gloss(m))}<br>${where}</span>`;
     if (g.chart) li.onclick = () => go(g.chart, { type: 'cell', key: `${g.sec}-${g.deng}-${g.col}` });
     ul.appendChild(li);
   });

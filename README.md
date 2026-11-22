@@ -1,7 +1,10 @@
 # Web韻圖 〜文海〜
 
-Yunjing-style (韻鏡) rhyme tables of the Tangut rhyme dictionary *Wenhai* (文海), with Gong Hwang-cherng's reconstructions, the MB reconstruction, and
-Marc Miyake's *Tangut Database* ver. 4.0 (2019).
+Yunjing-style (韻鏡) rhyme tables of the Tangut rhyme dictionary *Wenhai* (文海), with Gong Hwang-cherng's reconstructions and Marc Miyake's *Tangut Database* ver. 4.0 (2019).
+
+Wenhai entries and the MB reconstruction come from Mathieu Beaudouin, *The Digital Wenhai: A Unicode-Compliant
+Dataset of the Backbone of Tangut Linguistics and Philology* (Zenodo). Character meanings (English / Chinese):
+*Tangut characters by group* v2.0.
 
 **Site:** https://arcoinblue.github.io/wenhai-yunjing/
 
@@ -9,7 +12,8 @@ Marc Miyake's *Tangut Database* ver. 4.0 (2019).
   平合 (tone 1, -w-), 上合 (tone 2, -w-), each with grades (等) I–IV.
 - Columns follow the nine Tangut initial classes (九音), labelled with their Tangut names.
 - Each cell shows one 小韻 (first in Wenhai order). Click a cell to see every 小韻 placed there, with
-  fanqie, all member characters, Li Fanwen numbers, Wenhai positions, GHC, MB and Miyake readings.
+  fanqie, GHC / MB / Miyake readings, and every member character with its meaning (English or Chinese),
+  Li Fanwen number and Wenhai position.
 - Click a row roundel for rhyme details. Search by character, reading, Li Fanwen number or Wenhai position.
 - Links are shareable: `#c=<chart>&s=<section>-<grade>-<initial>`.
 
