@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Web韻圖 〜文海〜 · Tangut Wenhai rhyme tables</title>
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="data:,">
+</head>
+<body>
+<div id="app">
+  <aside id="side">
+    <h1>Web韻圖<br><span class="sub">〜文海〜</span></h1>
+    <p class="tagline">Yunjing-style rhyme tables of the Tangut <i>Wenhai</i>, with Miyake (2019) and Gong Hwang-cherng readings</p>
+
+    <div class="ctl">
+      <label for="chartSel">Chart</label>
+      <select id="chartSel"></select>
+    </div>
+
+    <fieldset class="opts">
+      <legend>Show in cells</legend>
+      <label><input type="checkbox" id="optFanqie"> fanqie spellers</label>
+      <label><input type="checkbox" id="optMiyake"> Miyake reading</label>
+    </fieldset>
+
+    <div class="ctl">
+      <label for="q">Search</label>
+      <div class="search">
+        <input id="q" type="search" placeholder="𘀏 · khu · L3909 · 05.131" autocomplete="off">
+      </div>
+      <div class="hint">Tangut character, Miyake or GHC reading, Li Fanwen no., or Wenhai position</div>
+      <ul id="results"></ul>
+    </div>
+
+    <div class="legend">
+      <div><span class="rn trad">𘁨</span> Wenhai rhyme-name character</div>
+      <div><span class="rn">𗾀</span> no Wenhai name (上聲 lost): first 小韻 of the row</div>
+      <div><span class="badge-demo">2</span> number of 小韻 sharing the cell</div>
+    </div>
+
+    <details class="about">
+      <summary>About</summary>
+      <p>Each cell shows one 小韻 (the first in Wenhai order); click it to see every 小韻 placed in that cell, with fanqie, all characters, and readings.</p>
+      <p>Sections: 平開 tone 1 without -w-, 上開 tone 2 without -w-, 平合 tone 1 with -w-, 上合 tone 2 with -w-. Rows are Miyake's grades I–IV. Charts are ordered by 攝; within a 攝: plain (本), tense (緊), retroflex (捲), long (長), long retroflex (長捲).</p>
+      <p>Placement uses Miyake's rhyme, grade, initial and medial; tone comes from the part of the Wenhai the entry is in. Tone 2 comes only from the 雜類 (the 上聲 part of the Wenhai is lost).</p>
+      <p>Sources: Wenhai entry data (spreadsheet); Marc Miyake, <i>Tangut Database</i> ver. 4.0 (2019); GHC = Gong Hwang-cherng's reconstruction. Tangut font: Noto Serif Tangut (SIL OFL).</p>
+    </details>
+  </aside>
+
+  <main id="main">
+    <div id="chartWrap"><table id="chart"></table></div>
+  </main>
+
+  <section id="panel">
+    <div id="panelBody"><p class="placeholder">Click a character in the chart to see its 小韻.<br>Click a row name (roundel) for the rhyme.</p></div>
+  </section>
+</div>
+<script src="app.js"></script>
+</body>
+</html>
