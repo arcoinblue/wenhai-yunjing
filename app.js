@@ -38,7 +38,7 @@ const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '
 const chars = s => Array.from(s || '');
 
 // ---- load ---------------------------------------------------------------
-fetch('data/wenhai.json?v=3').then(r => r.json()).then(d => {
+fetch('data/wenhai.json?v=4').then(r => r.json()).then(d => {
   D = d;
   charIndex = {};
   for (const [id, g] of Object.entries(D.groups))
@@ -50,7 +50,7 @@ fetch('data/wenhai.json?v=3').then(r => r.json()).then(d => {
     sel_.appendChild(o);
   });
   sel_.onchange = () => go(+sel_.value);
-  $('#optFanqie').onchange = $('#optGhc').onchange = $('#optMiyake').onchange = () => { saveOpts(); render(); };
+  ['#optFanqie', '#optGhc', '#optMb', '#optMiyake', '#optFinal'].forEach(id => $(id).onchange = () => { saveOpts(); render(); });
   loadOpts();
   $('#q').oninput = search;
   window.onhashchange = fromHash;
@@ -65,11 +65,13 @@ fetch('data/wenhai.json?v=3').then(r => r.json()).then(d => {
 function loadOpts() {
   try {
     const o = JSON.parse(localStorage.getItem('wyj-opts') || '{}');
-    $('#optFanqie').checked = !!o.fq; $('#optGhc').checked = !!o.gh; $('#optMiyake').checked = !!o.rd;
+    $('#optFanqie').checked = !!o.fq; $('#optGhc').checked = !!o.gh; $('#optMb').checked = !!o.mb;
+    $('#optMiyake').checked = !!o.rd; $('#optFinal').checked = o.rf !== false;
   } catch (e) { /* storage unavailable */ }
 }
 function saveOpts() {
-  try { localStorage.setItem('wyj-opts', JSON.stringify({ fq: $('#optFanqie').checked, gh: $('#optGhc').checked, rd: $('#optMiyake').checked })); }
+  try { localStorage.setItem('wyj-opts', JSON.stringify({ fq: $('#optFanqie').checked, gh: $('#optGhc').checked, mb: $('#optMb').checked,
+    rd: $('#optMiyake').checked, rf: $('#optFinal').checked })); }
   catch (e) { /* ignore */ }
 }
 
@@ -108,7 +110,8 @@ function isGroupStart(i) { return i === 0 || DISPLAY[i - 1][1] !== DISPLAY[i][1]
 
 function render() {
   const C = D.charts[cur - 1];
-  const fq = $('#optFanqie').checked, gh = $('#optGhc').checked, rd = $('#optMiyake').checked;
+  const fq = $('#optFanqie').checked, gh = $('#optGhc').checked, mb = $('#optMb').checked,
+    rd = $('#optMiyake').checked, rf = $('#optFinal').checked;
   const T = [];
   // header row 1: nav + 九音 names
   T.push('<thead><tr>');
@@ -133,7 +136,7 @@ function render() {
       T.push(`<td class="deng">${DENG[d]}</td>`);
       const rn = C.rows[`${s}-${d}`];
       const rkey = `${s}-${d}`;
-      T.push(`<td class="rowname">${rn ? `<span class="rn ${rn.trad ? 'trad' : ''} ${sel && sel.type === 'row' && sel.key === rkey ? 'sel' : ''}" data-row="${rkey}" title="${esc(rn.wr)}">${esc(rn.c)}</span>` : ''}</td>`);
+      T.push(`<td class="rowname">${rn ? `<span class="rn ${rn.trad ? 'trad' : ''} ${sel && sel.type === 'row' && sel.key === rkey ? 'sel' : ''}" data-row="${rkey}" title="${esc(rn.wr)} ${esc(rn.gf)}">${esc(rn.c)}</span>${rf && rn.gf ? `<span class="rf">${esc(rn.gf)}</span>` : ''}` : ''}</td>`);
       DISPLAY.forEach((c, i) => {
         const key = `${s}-${d}-${c[0]}`;
         const ids = C.cells[key];
@@ -146,8 +149,9 @@ function render() {
           inner = `<span class="ch">${esc(g.rep)}</span>`;
           if (fq) inner += `<span class="fq">${esc(speller(g.fanqie))}</span>`;
           if (gh) inner += `<span class="rd">${esc(g.ghc)}</span>`;
+          if (mb) inner += `<span class="rd">${esc(g.mb)}</span>`;
           if (rd) inner += `<span class="rd">${esc(reading(g.miyake))}</span>`;
-          if (ids.length > 1) inner += `<span class="badge">${ids.length}</span>`;
+          if (ids.length > 1) inner += '<span class="mark"></span>';
         } else inner = '<span class="o"></span>';
         T.push(`<td class="${cls.join(' ')}" ${ids ? `data-cell="${key}"` : ''}>${inner}</td>`);
       });
@@ -171,8 +175,11 @@ const reading = cx => (cx || '').replace(/^\d/, '').replace(/\d$/, '');
 function readingOf(ch) {   // GHC first; Miyake only if GHC is missing
   const hits = charIndex[ch];
   if (!hits) return '';
-  const g = [...new Set(hits.map(h => h.m.ghc).filter(Boolean))];
-  return (g.length ? g : [...new Set(hits.map(h => h.m.miyake).filter(Boolean))]).join(', ');
+  for (const k of ['ghc', 'mb', 'miyake']) {
+    const v = [...new Set(hits.map(h => h.m[k]).filter(Boolean))];
+    if (v.length) return v.join(', ');
+  }
+  return '';
 }
 function fanqieHTML(f) {
   if (!f) return '<span style="color:#888">—</span>';
@@ -185,6 +192,7 @@ function rhymeLine(g) {
   const R = D.rhymes[g.mrhyme];
   let s = '';
   if (g.wr) s += `Wenhai ${esc(g.wr)} ${g.wrName ? `<span class="tg">${esc(g.wrName)}</span>` : ''}`;
+  if (g.gf) s += `${s ? ' · ' : ''}GHC -${esc(g.gf)}`;
   if (R) s += `${s ? ' · ' : ''}Miyake rhyme ${g.mrhyme} (${esc(R.final)})`;
   return s;
 }
@@ -193,7 +201,7 @@ function cardHTML(id, idx, total) {
   const tag = g.shown ? '<span class="tag">in chart</span>' : '<span class="tag hid">not shown</span>';
   const rows = g.m.map((m, i) => `<tr class="${m.flag ? 'warn' : ''}" title="${esc(m.flag)}">
       <td class="n">${i + 1}</td><td class="tg">${esc(m.c)}</td><td>${esc(m.lfw)}</td>
-      <td>${esc(m.pos)}</td><td>${esc(m.ghc)}</td><td>${esc(m.miyake)}</td></tr>`).join('');
+      <td>${esc(m.pos)}</td><td>${esc(m.ghc)}</td><td>${esc(m.mb)}</td><td>${esc(m.miyake)}</td></tr>`).join('');
   return `<div class="card">
     <div class="card-h"><span class="big">${esc(g.rep)}</span>
       <div class="info">小韻 ${idx} / ${total} ${tag}<br>Wenhai ${esc(g.pos)} · ${esc(g.part)}</div></div>
@@ -201,10 +209,11 @@ function cardHTML(id, idx, total) {
       <dt>Fanqie</dt><dd>${fanqieHTML(g.fanqie)}</dd>
       <dt>Rhyme</dt><dd>${rhymeLine(g)}</dd>
       <dt>GHC</dt><dd>${esc(g.ghc)}</dd>
+      <dt>MB</dt><dd>${esc(g.mb)}</dd>
       <dt>Miyake</dt><dd>${esc(g.miyake)}</dd>
       <dt>Characters</dt><dd>${g.m.length}</dd>
     </dl>
-    <table class="mem"><thead><tr><th></th><th>字</th><th>LFW</th><th>Wenhai</th><th>GHC</th><th>Miyake</th></tr></thead>
+    <table class="mem"><thead><tr><th></th><th>字</th><th>LFW</th><th>Wenhai</th><th>GHC</th><th>MB</th><th>Miyake</th></tr></thead>
       <tbody>${rows}</tbody></table>
     ${g.flag ? `<div class="flag">⚠ ${esc(g.flag)}</div>` : ''}
   </div>`;
@@ -237,7 +246,8 @@ function showPanel() {
       <div class="slot-sub">${SECDESC[s]} · grade ${DENGR[d]} · ${n} cell(s) filled</div>
       <div class="card"><div class="card-h"><span class="rn rhyme-big ${rn.trad ? 'trad' : ''}">${esc(rn.c)}</span>
         <div class="info">${rn.trad ? 'Wenhai rhyme name' : 'No Wenhai rhyme name (上聲 lost);<br>first 小韻 of the row'}</div></div>
-      <dl class="kv"><dt>Wenhai rhyme</dt><dd>${esc(rn.wr || '—')}${rn.all && rn.all !== rn.wr ? ` (row also has ${esc(rn.all)})` : ''}</dd>
+      <dl class="kv"><dt>GHC final</dt><dd><b>${esc(rn.gf || '—')}</b></dd>
+      <dt>Wenhai rhyme</dt><dd>${esc(rn.wr || '—')}${rn.all && rn.all !== rn.wr ? ` (row also has ${esc(rn.all)})` : ''}</dd>
       <dt>Source</dt><dd>${esc(rn.src)}</dd></dl></div>` +
       rn.mr.map(r => rhymeCard(r)).join('');
   }
@@ -247,8 +257,11 @@ function rhymeCard(r) {
   if (!R) return '';
   const names = R.wenhai.map(w => `${esc(w)}${R.wenhaiNames[w] ? ` <span class="tg">${esc(R.wenhaiNames[w])}</span>` : ''}`).join(' · ');
   const gr = Object.entries(R.grades).map(([k, v]) => `${k} (${v})`).join(', ');
+  const alt = (R.ghcAll || []).slice(1, 4);
   return `<div class="card"><dl class="kv">
-    <dt>Miyake rhyme</dt><dd><b>${r}</b> ${esc(R.final)}</dd>
+    <dt>Rhyme</dt><dd><b>${r}</b></dd>
+    <dt>GHC</dt><dd><b>${esc(R.ghc || '—')}</b>${alt.length ? ` <span class="muted">(also ${alt.map(esc).join(', ')})</span>` : ''}</dd>
+    <dt>Miyake</dt><dd>${esc(R.final)}</dd>
     <dt>Wenhai</dt><dd>${names || '—'}</dd>
     <dt>Grades</dt><dd>${gr}</dd>
     <dt>Characters</dt><dd>${R.n} in Miyake's database</dd></dl></div>`;
@@ -271,7 +284,8 @@ function search() {
       for (const m of g.m) {
         const lfw = m.lfw.replace(/^L0*/, '');
         if (m.pos === q || lfw === ql.replace(/^0+/, '') || reading(m.miyake).toLowerCase() === ql ||
-            m.miyake.toLowerCase() === ql || m.ghc.replace(/[¹²]/g, '') === q || m.ghc === q) { add(+id, m); break; }
+            m.miyake.toLowerCase() === ql || m.ghc.replace(/[¹²]/g, '') === q || m.ghc === q ||
+            m.mb === q || m.mb.replace(/[¹²]/g, '') === q) { add(+id, m); break; }
       }
     }
   }
@@ -279,7 +293,7 @@ function search() {
     const g = D.groups[id];
     const li = document.createElement('li');
     const where = g.chart ? `chart ${g.chart} · ${SECTIONS[g.sec]} · ${DENG[g.deng]} · ${COLMAP[g.col][3]}${g.shown ? '' : ' (not shown)'}` : 'not placed';
-    li.innerHTML = `<span class="tg">${esc(m.c)}</span><span class="meta">${esc(m.ghc)} · ${esc(m.miyake)} · ${esc(m.pos)}<br>${where}</span>`;
+    li.innerHTML = `<span class="tg">${esc(m.c)}</span><span class="meta">${esc(m.ghc)} · ${esc(m.mb)} · ${esc(m.miyake)} · ${esc(m.pos)}<br>${where}</span>`;
     if (g.chart) li.onclick = () => go(g.chart, { type: 'cell', key: `${g.sec}-${g.deng}-${g.col}` });
     ul.appendChild(li);
   });
