@@ -38,7 +38,7 @@ const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '
 const chars = s => Array.from(s || '');
 
 // ---- load ---------------------------------------------------------------
-fetch('data/wenhai.json').then(r => r.json()).then(d => {
+fetch('data/wenhai.json?v=3').then(r => r.json()).then(d => {
   D = d;
   charIndex = {};
   for (const [id, g] of Object.entries(D.groups))
