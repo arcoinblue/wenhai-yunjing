@@ -15,7 +15,7 @@ Dataset of the Backbone of Tangut Linguistics and Philology* (Zenodo). Character
   fanqie, GHC / MB / Miyake readings, and every member character with its meaning (English or Chinese),
   Li Fanwen number and Wenhai position.
 - Click a Wenhai position (e.g. `93.121`) to open that page of the Wenhai: transcription on the left, facsimile
-  half-folio on the right, with zoom, pan and page turning. Images: `pages/<folio>-<side>.jpg` (e.g. `05-2`, `M02-1`).
+  half-folio on the right, with zoom, pan and page turning. Images: `pages/<folio>-<side>.jpg` (e.g. `05-1`, `M02-1`).
 - Click a row roundel for rhyme details. Search by character, reading, Li Fanwen number or Wenhai position.
 - Links are shareable: `#c=<chart>&s=<section>-<grade>-<initial>`.
 
