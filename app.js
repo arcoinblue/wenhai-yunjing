@@ -52,6 +52,11 @@ fetch('data/wenhai.json?v=6').then(r => r.json()).then(d => {
   sel_.onchange = () => go(+sel_.value);
   ['#optFanqie', '#optGhc', '#optMb', '#optMiyake', '#optFinal'].forEach(id => $(id).onchange = () => { saveOpts(); render(); });
   document.querySelectorAll('input[name=lang]').forEach(r => r.onchange = () => { saveOpts(); showPanel(); search(); });
+  $('#optFit').onchange = () => { saveOpts(); fit(); };
+  $('#foldSide').onclick = () => setFold('side', !$('#app').classList.contains('side-folded'));
+  $('#foldPanel').onclick = () => setFold('panel', !$('#app').classList.contains('panel-folded'));
+  window.addEventListener('resize', () => requestAnimationFrame(fit));
+  $('#app').addEventListener('transitionend', e => { if (e.target.id === 'app') fit(); });
   loadOpts();
   $('#q').oninput = search;
   window.onhashchange = fromHash;
@@ -69,11 +74,14 @@ function loadOpts() {
     $('#optFanqie').checked = !!o.fq; $('#optGhc').checked = !!o.gh; $('#optMb').checked = !!o.mb;
     $('#optMiyake').checked = !!o.rd; $('#optFinal').checked = o.rf !== false;
     const l = document.querySelector(`input[name=lang][value=${o.lang === 'zh' ? 'zh' : 'en'}]`); if (l) l.checked = true;
+    $('#optFit').checked = o.fit !== false;
+    setFold('side', !!o.sideF, false); setFold('panel', !!o.panelF, false);
   } catch (e) { /* storage unavailable */ }
 }
 function saveOpts() {
   try { localStorage.setItem('wyj-opts', JSON.stringify({ fq: $('#optFanqie').checked, gh: $('#optGhc').checked, mb: $('#optMb').checked,
-    rd: $('#optMiyake').checked, rf: $('#optFinal').checked, lang: LANG() })); }
+    rd: $('#optMiyake').checked, rf: $('#optFinal').checked, lang: LANG(), fit: $('#optFit').checked,
+    sideF: $('#app').classList.contains('side-folded'), panelF: $('#app').classList.contains('panel-folded') })); }
   catch (e) { /* ignore */ }
 }
 
@@ -157,8 +165,8 @@ function render() {
         } else inner = '<span class="o"></span>';
         T.push(`<td class="${cls.join(' ')}" ${ids ? `data-cell="${key}"` : ''}>${inner}</td>`);
       });
-      if (d === 1) T.push(`<td class="seclab" rowspan="4" title="${SECDESC[s]}">${SECTIONS[s]}</td>`);
-      if (s === 1 && d === 1) T.push(`<td class="title" rowspan="16">${esc(C.title)}　${esc(C.sheCN)}${esc(C.blockLabel)}</td>`);
+      if (d === 1) T.push(`<td class="seclab" rowspan="4" title="${SECDESC[s]}"><div class="vt">${SECTIONS[s]}</div></td>`);
+      if (s === 1 && d === 1) T.push(`<td class="title" rowspan="16"><div class="vt">${esc(C.title)}　${esc(C.sheCN)}${esc(C.blockLabel)}</div></td>`);
       T.push('</tr>');
     }
   }
@@ -168,6 +176,29 @@ function render() {
   t.querySelectorAll('[data-nav]').forEach(b => b.onclick = () => go(cur + +b.dataset.nav));
   t.querySelectorAll('[data-cell]').forEach(td => td.onclick = () => { sel = { type: 'cell', key: td.dataset.cell }; setHash(); render(); showPanel(); });
   t.querySelectorAll('[data-row]').forEach(el => el.onclick = () => { sel = { type: 'row', key: el.dataset.row }; setHash(); render(); showPanel(); });
+  fit();
+}
+
+// ---- fit chart to the available width (instead of squeezing columns) ------
+function fit() {
+  const wrap = $('#chartWrap'), main = $('#main');
+  wrap.style.zoom = 1;
+  if (!$('#optFit').checked) return;
+  const avail = main.clientWidth - 36;
+  const need = wrap.offsetWidth;
+  const z = Math.min(1, avail / need);
+  wrap.style.zoom = z > 0.3 ? z.toFixed(3) : 0.3;
+}
+
+// ---- foldable side panels ---------------------------------------------------
+function setFold(which, folded, save = true) {
+  $('#app').classList.toggle(which + '-folded', folded);
+  const b = which === 'side' ? $('#foldSide') : $('#foldPanel');
+  b.textContent = which === 'side' ? (folded ? '›' : '‹') : (folded ? '‹' : '›');
+  b.title = (folded ? 'Show ' : 'Hide ') + (which === 'side' ? 'sidebar' : 'details panel');
+  if (save) saveOpts();
+  requestAnimationFrame(fit);
+  setTimeout(fit, 260);          // after the grid transition has finished
 }
 
 const LANG = () => (document.querySelector('input[name=lang]:checked') || {}).value || 'en';
@@ -234,6 +265,7 @@ function slotTitle(s, d, k) {
     <div class="slot-sub">${SECDESC[s]} · grade ${DENGR[d]} · ${c[1]}. <span class="tg">${esc(K.tg)}</span> ${esc(K.tr)} (${K.zh}) · initial ${esc(c[3])} · ${c[2]}</div>`;
 }
 function showPanel() {
+  if (sel && $('#app').classList.contains('panel-folded')) setFold('panel', false);
   const P = $('#panelBody');
   const C = D.charts[cur - 1];
   if (!sel) {

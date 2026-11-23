@@ -35,7 +35,22 @@ body { font-family: var(--cjk); color: var(--ink); background: var(--bg);
 .tg { font-family: var(--tg); }
 .muted { color: var(--ink-soft); font-size: 12px; }
 
-#app { display: grid; grid-template-columns: 230px minmax(0, 1fr) 410px; height: 100vh; }
+#app { --sidew: 230px; --panelw: 410px; display: grid; height: 100vh;
+  grid-template-columns: var(--sidew) minmax(0, 1fr) var(--panelw); transition: grid-template-columns .2s; }
+#app.side-folded { --sidew: 30px; }
+#app.panel-folded { --panelw: 30px; }
+#side, #panel { position: relative; }
+.fold { position: absolute; top: 8px; z-index: 5; width: 22px; height: 30px; padding: 0;
+  border: 1px solid #cfc7ba; border-radius: 6px; background: var(--paper); color: var(--ink-soft);
+  font-size: 16px; line-height: 1; cursor: pointer; }
+.fold:hover { background: #fff; color: var(--ink); }
+#foldSide { right: 4px; }
+#foldPanel { left: 4px; }
+#app.side-folded #side { padding: 0; overflow: hidden; }
+#app.side-folded .side-in { display: none; }
+#app.panel-folded #panel { padding: 0; overflow: hidden; }
+#app.panel-folded #panelBody { display: none; }
+#panelBody { padding-left: 18px; }
 #side { background: var(--side); padding: 20px 18px; overflow-y: auto; font-size: 15px;
   border-right: 1px solid #d8d1c4; }
 #main { overflow: auto; padding: 18px; }
@@ -72,7 +87,7 @@ input[type=search] { font-family: var(--tg); }
 .about summary { cursor: pointer; font-weight: 600; }
 
 /* ------------------------------------------------------------- chart ---- */
-#chartWrap { display: inline-block; background: var(--paper); border: 4px double var(--rule-strong);
+#chartWrap { display: inline-block; width: max-content; background: var(--paper); border: 4px double var(--rule-strong);
   padding: 3px; box-shadow: 0 1px 6px rgba(80, 65, 45, .10); }
 #chart { border-collapse: collapse; color: var(--ink); }
 #chart td, #chart th { padding: 0; text-align: center; vertical-align: middle; }
@@ -93,10 +108,13 @@ tr.secend td { border-bottom: 1px solid var(--rule); }
 .deng { width: 24px; font-size: 13px; color: var(--ink-soft); }
 .rowname { width: 52px; line-height: 1; }
 .rowname .rf { display: block; font-family: Georgia, serif; font-size: 9.5px; color: var(--ink-soft); margin-top: 1px; }
-.seclab { width: 34px; font-size: 20px; writing-mode: vertical-rl; letter-spacing: 4px; color: #4a433c; }
-.title { width: 40px; font-size: 21px; writing-mode: vertical-rl; vertical-align: top !important;
-  padding-top: 24px !important; letter-spacing: 3px; border-left: 1.5px solid var(--rule); color: #4a433c; }
-td.c { width: var(--cell); height: var(--row); position: relative; cursor: default; transition: background .12s; }
+.seclab { width: 34px; min-width: 34px; font-size: 20px; color: #4a433c; }
+.title { width: 40px; min-width: 40px; font-size: 21px; vertical-align: top !important;
+  padding-top: 24px !important; border-left: 1.5px solid var(--rule); color: #4a433c; }
+.vt { writing-mode: vertical-rl; display: inline-block; letter-spacing: 4px; white-space: nowrap; }
+.title .vt { letter-spacing: 3px; }
+.deng { min-width: 24px; } .rowname { min-width: 52px; }
+td.c { width: var(--cell); min-width: var(--cell); height: var(--row); position: relative; cursor: default; transition: background .12s; }
 td.c.has { cursor: pointer; }
 td.c.has:hover:not(.sel) { background: var(--hover); }
 td.c.sel { background: var(--sel); box-shadow: inset 0 0 0 1.5px var(--sel-edge); }
@@ -151,7 +169,8 @@ table.mem .rdiff { display: block; font-size: 10.5px; color: #9a6a2c; }
 .rhyme-big { font-size: 44px; width: 62px; height: 62px; cursor: default; }
 
 @media (max-width: 1100px) {
-  #app { grid-template-columns: 1fr; height: auto; }
+  #app, #app.side-folded, #app.panel-folded { grid-template-columns: 1fr; height: auto; }
+  #app.side-folded #side, #app.panel-folded #panel { min-height: 44px; }
   #side, #panel { border: none; }
   #main { order: 2; }
   #panel { order: 3; }
