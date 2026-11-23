@@ -9,7 +9,7 @@ Dataset of the Backbone of Tangut Linguistics and Philology* (Zenodo). Character
 **Site:** https://arcoinblue.github.io/wenhai-yunjing/
 
 - 39 charts, ordered by 攝; each chart has four sections: 平開 (tone 1, no -w-), 上開 (tone 2, no -w-),
-  平合 (tone 1, -w-), 上合 (tone 2, -w-), each with grades (等) I–IV.
+  平合 (tone 1, -w-), 上合 (tone 2, -w-), each with three 等 rows set by GHC's medials (一: no i/j, 二: -i-, 三: -j-).
 - Columns follow the nine Tangut initial classes (九音), labelled with their Tangut names.
 - Each cell shows one 小韻 (first in Wenhai order). Click a cell to see every 小韻 placed there, with
   fanqie, GHC / MB / Miyake readings, and every member character with its meaning (English or Chinese),

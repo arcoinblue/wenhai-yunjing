@@ -28,8 +28,10 @@ const COLMAP = Object.fromEntries(COLS.map(c => [c[0], c]));
 const DISPLAY = COLS.slice().reverse();               // Yunjing: 唇 on the right
 const SECTIONS = { 1: '平開', 2: '上開', 3: '平合', 4: '上合' };
 const SECDESC = { 1: 'tone 1, no -w-', 2: 'tone 2, no -w-', 3: 'tone 1, -w-', 4: 'tone 2, -w-' };
-const DENG = { 1: '一', 2: '二', 3: '三', 4: '四' };
-const DENGR = { 1: 'I', 2: 'II', 3: 'III', 4: 'IV' };
+const DENG = { 1: '一', 2: '二', 3: '三' };
+const NDENG = 3;   // 等 from GHC medials: none = 一, -i- = 二, -j- = 三
+const DENGDESC = { 1: 'no medial i/j (GHC)', 2: 'GHC medial -i-', 3: 'GHC medial -j-' };
+const MGRADE = { 1: 'I', 2: 'II', 3: 'III', 4: 'IV' };
 const BLOCKEN = { plain: 'plain', tense: 'tense', r: 'retroflex', long: 'long', longr: 'long retroflex', misc: 'other' };
 
 let D = null, cur = 1, sel = null, charIndex = null;
@@ -38,7 +40,7 @@ const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '
 const chars = s => Array.from(s || '');
 
 // ---- load ---------------------------------------------------------------
-fetch('data/wenhai.json?v=6').then(r => r.json()).then(d => {
+fetch('data/wenhai.json?v=13').then(r => r.json()).then(d => {
   D = d;
   charIndex = {};
   for (const [id, g] of Object.entries(D.groups))
@@ -142,8 +144,8 @@ function render() {
   T.push('</tr></thead><tbody>');
   // body
   for (let s = 1; s <= 4; s++) {
-    for (let d = 1; d <= 4; d++) {
-      T.push(`<tr class="${d === 4 ? 'secend' : ''}">`);
+    for (let d = 1; d <= NDENG; d++) {
+      T.push(`<tr class="${d === NDENG ? 'secend' : ''}">`);
       T.push(`<td class="deng">${DENG[d]}</td>`);
       const rn = C.rows[`${s}-${d}`];
       const rkey = `${s}-${d}`;
@@ -166,8 +168,8 @@ function render() {
         } else inner = '<span class="o"></span>';
         T.push(`<td class="${cls.join(' ')}" ${ids ? `data-cell="${key}"` : ''}>${inner}</td>`);
       });
-      if (d === 1) T.push(`<td class="seclab" rowspan="4" title="${SECDESC[s]}"><div class="vt">${SECTIONS[s]}</div></td>`);
-      if (s === 1 && d === 1) T.push(`<td class="title" rowspan="16"><div class="vt">${esc(C.title)}　${esc(C.sheCN)}${esc(C.blockLabel)}</div></td>`);
+      if (d === 1) T.push(`<td class="seclab" rowspan="${NDENG}" title="${SECDESC[s]}"><div class="vt">${SECTIONS[s]}</div></td>`);
+      if (s === 1 && d === 1) T.push(`<td class="title" rowspan="${4 * NDENG}"><div class="vt">${esc(C.title)}　${esc(C.sheCN)}${esc(C.blockLabel)}</div></td>`);
       T.push('</tr>');
     }
   }
@@ -229,7 +231,7 @@ function rhymeLine(g) {
   let s = '';
   if (g.wr) s += `Wenhai ${esc(g.wr)} ${g.wrName ? `<span class="tg">${esc(g.wrName)}</span>` : ''}`;
   if (g.gf) s += `${s ? ' · ' : ''}GHC -${esc(g.gf)}`;
-  if (R) s += `${s ? ' · ' : ''}Miyake rhyme ${g.mrhyme} (${esc(R.final)})`;
+  if (R) s += `${s ? ' · ' : ''}Miyake rhyme ${g.mrhyme} (${esc(R.final)}${g.mgrade ? `, grade ${MGRADE[g.mgrade]}` : ''})`;
   return s;
 }
 function cardHTML(id, idx, total) {
@@ -263,7 +265,7 @@ function cardHTML(id, idx, total) {
 function slotTitle(s, d, k) {
   const c = COLMAP[k], K = CLASSES[c[1]];
   return `<div class="slot-h">${esc(D.charts[cur - 1].title)} · ${SECTIONS[s]} · ${DENG[d]}等</div>
-    <div class="slot-sub">${SECDESC[s]} · grade ${DENGR[d]} · ${c[1]}. <span class="tg">${esc(K.tg)}</span> ${esc(K.tr)} (${K.zh}) · initial ${esc(c[3])} · ${c[2]}</div>`;
+    <div class="slot-sub">${SECDESC[s]} · ${DENGDESC[d]} · ${c[1]}. <span class="tg">${esc(K.tg)}</span> ${esc(K.tr)} (${K.zh}) · initial ${esc(c[3])} · ${c[2]}</div>`;
 }
 function showPanel() {
   if (sel && $('#app').classList.contains('panel-folded')) setFold('panel', false);
@@ -286,7 +288,7 @@ function showPanel() {
     if (!rn) { P.innerHTML = ''; return; }
     const n = Object.keys(C.cells).filter(k => k.startsWith(sel.key + '-')).length;
     P.innerHTML = `<div class="slot-h">${esc(C.title)} · ${SECTIONS[s]} · ${DENG[d]}等</div>
-      <div class="slot-sub">${SECDESC[s]} · grade ${DENGR[d]} · ${n} cell(s) filled</div>
+      <div class="slot-sub">${SECDESC[s]} · ${DENGDESC[d]} · ${n} cell(s) filled</div>
       <div class="card"><div class="card-h"><span class="rn rhyme-big ${rn.trad ? 'trad' : ''}">${esc(rn.c)}</span>
         <div class="info">${rn.trad ? 'Wenhai rhyme name' : 'No Wenhai rhyme name (上聲 lost);<br>first 小韻 of the row'}</div></div>
       <dl class="kv"><dt>GHC final</dt><dd><b>${esc(rn.gf || '—')}</b></dd>
@@ -341,7 +343,7 @@ function search() {
   [...hits].slice(0, 80).forEach(([id, m]) => {
     const g = D.groups[id];
     const li = document.createElement('li');
-    const where = g.chart ? `chart ${g.chart} · ${SECTIONS[g.sec]} · ${DENG[g.deng]} · ${COLMAP[g.col][3]}${g.shown ? '' : ' (not shown)'}` : 'not placed';
+    const where = g.chart ? `chart ${g.chart} · ${SECTIONS[g.sec]} · ${DENG[g.deng]}等 · ${COLMAP[g.col][3]}${g.shown ? '' : ' (not shown)'}` : 'not placed';
     li.innerHTML = `<span class="tg">${esc(m.c)}</span><span class="meta">${esc(m.ghc)} · ${esc(gloss(m))}<br>${where}</span>`;
     if (g.chart) li.onclick = () => go(g.chart, { type: 'cell', key: `${g.sec}-${g.deng}-${g.col}` });
     ul.appendChild(li);
