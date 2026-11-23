@@ -17,7 +17,11 @@ Dataset of the Backbone of Tangut Linguistics and Philology* (Zenodo). Character
 - Click a row roundel for rhyme details. Search by character, reading, Li Fanwen number or Wenhai position.
 - Links are shareable: `#c=<chart>&s=<section>-<grade>-<initial>`.
 
+- Each 小韻 has a button that opens its page in 史金波, 白濱, 黃振華, 《文海研究》 (1983). The book is not
+  hosted here: the reader picks their own PDF copy once, and it is kept in their browser (IndexedDB), never uploaded.
+
 ## Files
 - `index.html`, `style.css`, `app.js`: the page (no build step, no dependencies)
 - `data/wenhai.json`: generated data (charts, 小韻, members, rhymes)
+- `viewer.js`, `vendor/pdfjs/`: page viewer (PDF.js 4.10, Apache License 2.0)
 - `fonts/NotoSerifTangut-subset.woff2`: Noto Serif Tangut, subset to the characters used (SIL Open Font License 1.1)

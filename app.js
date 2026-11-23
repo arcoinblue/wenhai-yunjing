@@ -203,6 +203,19 @@ function setFold(which, folded, save = true) {
 
 const LANG = () => (document.querySelector('input[name=lang]:checked') || {}).value || 'en';
 const gloss = m => (LANG() === 'zh' ? (m.zh || m.en) : (m.en || m.zh)) || '';
+// Wenhai position -> printed page of 史金波 et al. 1983《文海研究》 (PDF page - 1); see viewer.js
+function bookPage(pos) {
+  const m = /^(M?)(\d{2})\.(\d)/.exec(String(pos || '').trim());
+  if (!m) return null;
+  const z = m[1] === 'M', leaf = +m[2], half = +m[3];
+  let p;
+  if (z) { if (leaf < 2 || leaf > 22) return null; p = 315 + 2 * (leaf - 2); }
+  else if (leaf >= 4 && leaf <= 45) p = 137 + 2 * (leaf - 4);
+  else if (leaf >= 47 && leaf <= 93) p = 135 + 2 * (leaf - 4);
+  else return null;
+  return p + (half === 2 ? 1 : 0) - 1;
+}
+const pageBtn = pos => { const p = bookPage(pos); return p ? `<button class="pgbtn" data-pos="${esc(pos)}" title="Open this page of 文海研究 (1983)">文海研究 p. ${p}</button>` : ''; };
 const speller = f => { const a = chars(f.replace(/\s/g, '')); const i = a.indexOf('𘈖'); return (i > 0 ? a.slice(0, i) : a.slice(0, 2)).join(''); };
 const reading = cx => (cx || '').replace(/^\d/, '').replace(/\d$/, '');
 
@@ -240,11 +253,11 @@ function cardHTML(id, idx, total) {
     return `<tr class="${diff ? 'warn' : ''}" title="${esc(tip)}">
       <td class="n">${i + 1}</td><td class="tg">${esc(m.c)}</td>
       <td class="gl">${esc(gloss(m)) || '<span class="muted">—</span>'}${diff ? `<span class="rdiff">GHC ${esc(m.ghc)} · Miyake ${esc(m.miyake)}</span>` : ''}</td>
-      <td class="lfw">${esc(m.lfw)}<br><span class="muted">${esc(m.pos)}</span></td></tr>`;
+      <td class="lfw">${esc(m.lfw)}<br>${bookPage(m.pos) ? `<a href="#" class="poslink" data-pos="${esc(m.pos)}" title="文海研究 p. ${bookPage(m.pos)}">${esc(m.pos)}</a>` : `<span class="muted">${esc(m.pos)}</span>`}</td></tr>`;
   }).join('');
   return `<div class="card">
     <div class="card-h"><span class="big">${esc(g.rep)}</span>
-      <div class="info">小韻 ${idx} / ${total} ${tag}<br>Wenhai ${esc(g.pos)} · ${esc(g.part)}
+      <div class="info">小韻 ${idx} / ${total} ${tag}<br>Wenhai ${esc(g.pos)} · ${esc(g.part)} ${pageBtn(g.pos)}
         ${gloss(g.m[0]) ? `<br><span class="hgl">${esc(gloss(g.m.find(m => m.c === g.rep) || g.m[0]))}</span>` : ''}</div></div>
     <dl class="kv">
       <dt>Fanqie</dt><dd>${fanqieHTML(g.fanqie)}</dd>
@@ -279,6 +292,10 @@ function showPanel() {
     const [s, d, k] = sel.key.split('-');
     const ids = C.cells[sel.key] || [];
     P.innerHTML = slotTitle(+s, +d, k) + ids.map((id, i) => cardHTML(id, i + 1, ids.length)).join('');
+    P.querySelectorAll('[data-pos]').forEach(b => b.onclick = e => {
+      e.preventDefault();
+      if (window.openWenhaiPage) window.openWenhaiPage(b.dataset.pos);
+    });
   } else {
     const [s, d] = sel.key.split('-');
     const rn = C.rows[sel.key];
