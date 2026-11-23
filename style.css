@@ -212,3 +212,10 @@ a.poslink:hover { color: #3f3831; }
 .pv-foot a { color: #6b5532; }
 
 .pv-pick[hidden], .pv-body[hidden] { display: none !important; }
+
+/* ------------------------------------------------------- font switch ---- */
+.fontsel label { display: block; margin: 3px 0; }
+.font-status { font: 11.5px/1.45 Georgia, var(--cjk); color: var(--ink-soft); margin-top: 6px; }
+.font-status .ok { color: #4e6b3a; }
+.font-status .bad { color: #a0472f; }
+.font-status a { color: #6b5532; }

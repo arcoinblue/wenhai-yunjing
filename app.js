@@ -56,6 +56,7 @@ fetch('data/wenhai.json?v=6').then(r => r.json()).then(d => {
   $('#foldSide').onclick = () => setFold('side', !$('#app').classList.contains('side-folded'));
   $('#foldPanel').onclick = () => setFold('panel', !$('#app').classList.contains('panel-folded'));
   window.addEventListener('resize', () => requestAnimationFrame(fit));
+  window.addEventListener('tangut-font-changed', () => requestAnimationFrame(fit));
   $('#app').addEventListener('transitionend', e => { if (e.target.id === 'app') fit(); });
   loadOpts();
   $('#q').oninput = search;
