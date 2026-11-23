@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Web韻圖 〜文海〜 · Tangut Wenhai rhyme tables</title>
-<link rel="stylesheet" href="style.css?v=14">
+<link rel="stylesheet" href="style.css?v=15">
 <link rel="icon" href="data:,">
 </head>
 <body>
@@ -75,7 +75,25 @@
     <div id="panelBody"><p class="placeholder">Click a character in the chart to see its 小韻.<br>Click a row name (roundel) for the rhyme.</p></div>
   </section>
 </div>
-<script src="app.js?v=14"></script>
-<script type="module" src="fonts.js?v=14"></script>
+
+<div id="pageView" hidden>
+  <div class="pv-box">
+    <div class="pv-bar">
+      <button id="pvNext" title="Next page (←)">‹ next</button>
+      <div id="pvCap"></div>
+      <button id="pvPrev" title="Previous page (→)">prev ›</button>
+      <span class="pv-fit">
+        <button data-fit="all" title="Whole scan (0)">both</button>
+        <button data-fit="copy" title="Left half: transcription">transcription</button>
+        <button data-fit="orig" title="Right half: facsimile">original</button>
+      </span>
+      <button id="pvClose" title="Close (Esc)">✕</button>
+    </div>
+    <div id="pvStage"><img id="pvImg" alt="Wenhai page" draggable="false"><div id="pvLoad">loading…</div></div>
+    <div class="pv-hint">Scroll to zoom · drag to move · double-click to zoom in · ← / → turn pages (the book reads right to left)</div>
+  </div>
+</div>
+<script src="app.js?v=15"></script>
+<script type="module" src="fonts.js?v=15"></script>
 </body>
 </html>

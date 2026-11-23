@@ -63,8 +63,14 @@ fetch('data/wenhai.json?v=13').then(r => r.json()).then(d => {
   loadOpts();
   $('#q').oninput = search;
   window.onhashchange = fromHash;
+  $('#panelBody').addEventListener('click', e => {
+    const a = e.target.closest('[data-pos]'); if (!a) return;
+    e.preventDefault(); openPage(a.dataset.pos);
+  });
+  initPageView();
   document.addEventListener('keydown', e => {
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+    if (!$('#pageView').hidden) return;          // the page viewer has its own keys
     if (e.key === 'ArrowLeft' || e.key === 'p') go(cur - 1);
     if (e.key === 'ArrowRight' || e.key === 'n') go(cur + 1);
   });
@@ -246,11 +252,11 @@ function cardHTML(id, idx, total) {
     return `<tr class="${diff ? 'warn' : ''}" title="${esc(tip)}">
       <td class="n">${i + 1}</td><td class="tg">${esc(m.c)}</td>
       <td class="gl">${esc(gloss(m)) || '<span class="muted">—</span>'}${diff ? `<span class="rdiff">GHC ${esc(m.ghc)} · Miyake ${esc(m.miyake)}</span>` : ''}</td>
-      <td class="lfw">${esc(m.lfw)}<br><span class="muted">${esc(m.pos)}</span></td></tr>`;
+      <td class="lfw">${esc(m.lfw)}<br>${posLink(m.pos, 'muted')}</td></tr>`;
   }).join('');
   return `<div class="card">
     <div class="card-h"><span class="big">${esc(g.rep)}</span>
-      <div class="info">小韻 ${idx} / ${total} ${tag}<br>Wenhai ${esc(rep.pos)} · ${esc(rep.lfw)} · ${esc(g.part)}
+      <div class="info">小韻 ${idx} / ${total} ${tag}<br>Wenhai ${posLink(rep.pos)} · ${esc(rep.lfw)} · ${esc(g.part)}
         ${gloss(rep) ? `<br><span class="hgl">${esc(gloss(rep))}</span>` : ''}</div></div>
     <dl class="kv">
       <dt>Fanqie</dt><dd>${fanqieHTML(g.fanqie)}</dd>
@@ -353,3 +359,100 @@ function search() {
   });
   if (!hits.size) ul.innerHTML = '<li class="meta">no match</li>';
 }
+
+// ---- Wenhai page viewer -------------------------------------------------------
+// Scans: pages/<folio>-<side>.jpg, each = transcription (left) + facsimile half-folio (right).
+// Folios 05–93 are the 平聲, M02–M22 the 雜類. Sides with no surviving text have no scan.
+const PAGES = `
+05-2 06-1 06-2 07-1 07-2 08-1 08-2 09-1 09-2 10-1 10-2 11-1 11-2 12-1 12-2 13-1 13-2 14-1 14-2 15-1
+15-2 16-1 16-2 17-1 17-2 18-1 18-2 19-1 19-2 20-1 20-2 21-1 21-2 22-1 22-2 23-1 23-2 24-1 24-2 25-1
+25-2 26-1 26-2 27-1 27-2 28-1 28-2 29-1 29-2 30-1 30-2 31-1 31-2 32-1 32-2 33-1 33-2 34-1 34-2 35-1
+35-2 36-1 36-2 37-1 37-2 38-1 38-2 39-1 39-2 40-1 40-2 41-1 41-2 42-1 42-2 43-1 43-2 44-1 44-2 45-1
+45-2 46-1 47-2 48-1 48-2 49-1 49-2 50-1 50-2 51-1 51-2 52-1 52-2 53-1 53-2 54-1 54-2 55-1 55-2 56-1
+56-2 57-1 57-2 58-1 58-2 59-1 59-2 60-1 60-2 61-1 61-2 62-1 62-2 63-1 63-2 64-1 64-2 65-1 65-2 66-1
+66-2 67-1 67-2 68-1 68-2 69-1 69-2 70-1 70-2 71-1 71-2 72-1 72-2 73-1 73-2 74-1 74-2 75-1 75-2 76-1
+76-2 77-1 77-2 78-1 78-2 79-1 79-2 80-1 80-2 81-1 81-2 82-1 82-2 83-1 83-2 84-1 84-2 85-1 85-2 86-1
+86-2 87-1 87-2 88-1 88-2 89-1 89-2 90-1 90-2 91-1 91-2 92-1 92-2 93-1 M02-1 M02-2 M03-1 M03-2 M04-1
+M04-2 M05-1 M05-2 M06-1 M06-2 M07-1 M07-2 M08-1 M09-1 M09-2 M10-1 M10-2 M11-1 M11-2 M12-1 M13-2
+M14-1 M14-2 M15-1 M15-2 M16-1 M17-2 M18-1 M18-2 M19-1 M19-2 M20-1 M20-2 M21-1 M22-1 M22-2`.trim().split(/\s+/);
+const PAGESET = new Set(PAGES);
+function parsePos(pos) {
+  const m = /^(M?\d{2})\.([12])(\d)(\d)?/.exec(pos || '');
+  return m ? { folio: m[1], side: m[2], col: m[3], entry: m[4] || '', page: `${m[1]}-${m[2]}` } : null;
+}
+function posLink(pos, cls = '') {
+  const p = parsePos(pos);
+  if (!p || !PAGESET.has(p.page)) return `<span class="${cls}">${esc(pos)}</span>`;
+  return `<a href="pages/${p.page}.jpg" class="wpos ${cls}" data-pos="${esc(pos)}" title="Show this Wenhai page">${esc(pos)}</a>`;
+}
+const PV = { page: null, pos: null, z: 1, x: 0, y: 0 };
+function initPageView() {
+  const V = $('#pageView'), st = $('#pvStage'), img = $('#pvImg');
+  const apply = () => { img.style.transform = `translate(${PV.x}px,${PV.y}px) scale(${PV.z})`; };
+  PV.fitTo = (part = 'all') => {           // all | copy (left half) | orig (right half)
+    const W = st.clientWidth, H = st.clientHeight, iw = img.naturalWidth, ih = img.naturalHeight;
+    if (!iw) return;
+    const x0 = part === 'orig' ? iw / 2 : 0, w = part === 'all' ? iw : iw / 2;
+    PV.z = Math.min(W / w, H / ih);
+    PV.x = (W - w * PV.z) / 2 - x0 * PV.z; PV.y = (H - ih * PV.z) / 2;
+    apply();
+    V.querySelectorAll('[data-fit]').forEach(b => b.classList.toggle('on', b.dataset.fit === part));
+  };
+  const zoomAt = (f, cx, cy) => {
+    const z = Math.min(Math.max(PV.z * f, 0.05), 3);
+    PV.x = cx - (cx - PV.x) * z / PV.z; PV.y = cy - (cy - PV.y) * z / PV.z; PV.z = z; apply();
+    V.querySelectorAll('[data-fit]').forEach(b => b.classList.remove('on'));
+  };
+  img.onload = () => { $('#pvLoad').hidden = true; PV.fitTo(PV.part || 'all'); };
+  st.addEventListener('wheel', e => {
+    e.preventDefault();
+    const r = st.getBoundingClientRect();
+    zoomAt(Math.exp(-e.deltaY * (e.ctrlKey ? 0.01 : 0.002)), e.clientX - r.left, e.clientY - r.top);
+  }, { passive: false });
+  let drag = null;
+  st.addEventListener('pointerdown', e => { drag = { x: e.clientX - PV.x, y: e.clientY - PV.y }; st.setPointerCapture(e.pointerId); st.classList.add('drag'); });
+  st.addEventListener('pointermove', e => { if (!drag) return; PV.x = e.clientX - drag.x; PV.y = e.clientY - drag.y; apply(); });
+  const end = () => { drag = null; st.classList.remove('drag'); };
+  st.addEventListener('pointerup', end); st.addEventListener('pointercancel', end);
+  st.addEventListener('dblclick', e => { const r = st.getBoundingClientRect(); zoomAt(2, e.clientX - r.left, e.clientY - r.top); });
+  V.querySelectorAll('[data-fit]').forEach(b => b.onclick = () => { PV.part = b.dataset.fit; PV.fitTo(PV.part); });
+  $('#pvNext').onclick = () => turnPage(1);
+  $('#pvPrev').onclick = () => turnPage(-1);
+  $('#pvClose').onclick = closePage;
+  V.addEventListener('click', e => { if (e.target === V) closePage(); });
+  document.addEventListener('keydown', e => {
+    if (V.hidden) return;
+    if (e.key === 'Escape') closePage();
+    else if (e.key === 'ArrowLeft') turnPage(1);     // the book reads right to left
+    else if (e.key === 'ArrowRight') turnPage(-1);
+    else if (e.key === '+' || e.key === '=') zoomAt(1.25, st.clientWidth / 2, st.clientHeight / 2);
+    else if (e.key === '-') zoomAt(0.8, st.clientWidth / 2, st.clientHeight / 2);
+    else if (e.key === '0') PV.fitTo(PV.part || 'all');
+    else return;
+    e.preventDefault();
+  });
+  window.addEventListener('resize', () => { if (!V.hidden) PV.fitTo(PV.part || 'all'); });
+}
+function openPage(pos) {
+  const p = parsePos(pos); if (!p || !PAGESET.has(p.page)) return;
+  PV.pos = pos; $('#pageView').hidden = false; document.body.classList.add('pv-open');
+  showPage(p.page);
+}
+function showPage(page) {
+  PV.page = page;
+  const [folio, side] = page.split('-');
+  const p = parsePos(PV.pos), here = p && p.page === page;
+  const part = folio.startsWith('M') ? '雜類' : '平聲';
+  const fn = folio.startsWith('M') ? 'M' + +folio.slice(1) : +folio;
+  $('#pvCap').innerHTML = `<b>Folio ${fn}, side ${side}</b> · ${part}` +
+    (here ? `<span class="pv-where"> · <b>${esc(PV.pos)}</b>: column ${p.col} from the right${p.entry ? `, entry ${p.entry}` : ''}</span>` : '');
+  const i = PAGES.indexOf(page);
+  $('#pvNext').disabled = i >= PAGES.length - 1; $('#pvPrev').disabled = i <= 0;
+  $('#pvLoad').hidden = false;
+  $('#pvImg').src = `pages/${page}.jpg`;
+}
+function turnPage(d) {
+  const i = PAGES.indexOf(PV.page) + d;
+  if (i >= 0 && i < PAGES.length) showPage(PAGES[i]);
+}
+function closePage() { $('#pageView').hidden = true; document.body.classList.remove('pv-open'); $('#pvImg').removeAttribute('src'); }

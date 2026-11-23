@@ -183,3 +183,30 @@ table.mem .rdiff { display: block; font-size: 10.5px; color: #9a6a2c; }
 .font-status .bad { color: #a0472f; }
 .font-status a { color: #6b5532; }
 .grp.single .v { white-space: nowrap; font-size: 13px; line-height: 1; }
+
+/* ---- Wenhai page viewer ---- */
+a.wpos { color: inherit; text-decoration: underline dotted; text-underline-offset: 2px; cursor: zoom-in; }
+a.wpos:hover { color: var(--mark); text-decoration-style: solid; }
+#pageView { position: fixed; inset: 0; z-index: 50; background: rgba(40, 35, 30, .55); display: flex; padding: 2.5vh 2.5vw; }
+#pageView[hidden] { display: none; }
+body.pv-open { overflow: hidden; }
+.pv-box { flex: 1; display: flex; flex-direction: column; background: var(--paper); border-radius: 6px;
+  box-shadow: 0 8px 40px rgba(0,0,0,.35); overflow: hidden; min-width: 0; }
+.pv-bar { display: flex; align-items: center; gap: 8px; padding: 7px 10px; background: var(--side);
+  border-bottom: 1px solid var(--circle); font: 13px/1.4 Georgia, var(--cjk); color: var(--ink); }
+#pvCap { flex: 1; text-align: center; min-width: 0; }
+.pv-where { color: var(--ink-soft); }
+.pv-bar button { font: inherit; font-size: 12.5px; padding: 3px 10px; border: 1px solid var(--circle);
+  background: var(--card); color: var(--ink); border-radius: 4px; cursor: pointer; }
+.pv-bar button:hover:not(:disabled) { background: var(--hover); }
+.pv-bar button:disabled { opacity: .35; cursor: default; }
+.pv-bar button.on, .pv-bar button.on:hover { background: var(--sel); border-color: var(--rule); }
+.pv-fit { display: inline-flex; gap: 3px; }
+#pvStage { flex: 1; position: relative; overflow: hidden; cursor: grab; touch-action: none; background: #f4f1ea; }
+#pvStage.drag { cursor: grabbing; }
+#pvImg { position: absolute; left: 0; top: 0; transform-origin: 0 0; user-select: none; max-width: none; }
+#pvLoad { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  color: var(--ink-soft); font: 14px Georgia, serif; pointer-events: none; }
+#pvLoad[hidden] { display: none; }
+.pv-hint { padding: 4px 10px; font-size: 11.5px; color: var(--ink-soft); text-align: center; border-top: 1px solid var(--circle); }
+@media (max-width: 700px) { #pageView { padding: 0; } .pv-box { border-radius: 0; } .pv-hint { display: none; } }
