@@ -237,7 +237,10 @@ function rhymeLine(g) {
 function cardHTML(id, idx, total) {
   const g = D.groups[id];
   const tag = g.shown ? '<span class="tag">in chart</span>' : '<span class="tag hid">not shown</span>';
-  const rows = g.m.map((m, i) => {
+  // the representative is shown in the card header, so it is left out of the list below
+  let ri = g.m.findIndex(m => m.c === g.rep); if (ri < 0) ri = 0;
+  const rep = g.m[ri], others = g.m.filter((_, i) => i !== ri);
+  const rows = others.map((m, i) => {
     const diff = m.ghc !== g.ghc || m.miyake !== g.miyake;
     const tip = `GHC ${m.ghc} · MB ${m.mb} · Miyake ${m.miyake}${m.flag ? ' · ' + m.flag : ''}`;
     return `<tr class="${diff ? 'warn' : ''}" title="${esc(tip)}">
@@ -247,8 +250,8 @@ function cardHTML(id, idx, total) {
   }).join('');
   return `<div class="card">
     <div class="card-h"><span class="big">${esc(g.rep)}</span>
-      <div class="info">小韻 ${idx} / ${total} ${tag}<br>Wenhai ${esc(g.pos)} · ${esc(g.part)}
-        ${gloss(g.m[0]) ? `<br><span class="hgl">${esc(gloss(g.m.find(m => m.c === g.rep) || g.m[0]))}</span>` : ''}</div></div>
+      <div class="info">小韻 ${idx} / ${total} ${tag}<br>Wenhai ${esc(rep.pos)} · ${esc(rep.lfw)} · ${esc(g.part)}
+        ${gloss(rep) ? `<br><span class="hgl">${esc(gloss(rep))}</span>` : ''}</div></div>
     <dl class="kv">
       <dt>Fanqie</dt><dd>${fanqieHTML(g.fanqie)}</dd>
       <dt>Rhyme</dt><dd>${rhymeLine(g)}</dd>
@@ -257,8 +260,8 @@ function cardHTML(id, idx, total) {
       <dt>Miyake</dt><dd>${esc(g.miyake)}</dd>
       <dt>Characters</dt><dd>${g.m.length}</dd>
     </dl>
-    <table class="mem"><thead><tr><th></th><th>字</th><th>${LANG() === 'zh' ? '字義' : 'Meaning'}</th><th>LFW · Wenhai</th></tr></thead>
-      <tbody>${rows}</tbody></table>
+    ${others.length ? `<table class="mem"><thead><tr><th></th><th>字</th><th>${LANG() === 'zh' ? '字義' : 'Meaning'}</th><th>LFW · Wenhai</th></tr></thead>
+      <tbody>${rows}</tbody></table>` : ''}
     ${g.flag ? `<div class="flag">⚠ ${esc(g.flag)}</div>` : ''}
   </div>`;
 }
