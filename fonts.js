@@ -2,7 +2,7 @@
 //  - Noto Serif Tangut: bundled (SIL OFL), always available.
 //  - Tangut Yinchuan: not redistributable, so it is used only if installed, or if the reader loads
 //    their own copy of the file (kept in this browser, never uploaded).
-//  - BabelStone Tangut Wenhai (SIL OFL): used if installed or loaded from a file; covers about half of
+//  - BabelStone Tangut Wenhai (SIL OFL): bundled (unmodified, with its licence); covers about half of
 //    the Tangut characters, and the rest fall back to Noto.
 const FONTS = {
   noto: {
@@ -18,9 +18,9 @@ const FONTS = {
   wenhai: {
     name: 'BabelStone Tangut Wenhai', family: 'TGWenhai',
     local: ['BabelStone Tangut Wenhai', 'BabelStoneTangutWenhai'],
-    bundled: null,                // set to 'fonts/BabelStoneTangutWenhai.ttf' once the file is in the repo
+    bundled: 'fonts/BabelStoneTangutWenhai.ttf',   // unmodified v1.002, SIL OFL 1.1
     url: 'https://babelstone.co.uk/Fonts/Wenhai.html',
-    note: 'Calligraphic; about half of the characters (the Wenhai headwords). Others fall back to Noto.',
+    note: 'Andrew West, SIL Open Font License. Calligraphic; covers about half of the characters (the Wenhai headwords); others are shown in Noto.',
   },
 };
 const BASE = '"TangutWeb", "Noto Serif Tangut", var(--cjk)';

@@ -219,3 +219,4 @@ a.poslink:hover { color: #3f3831; }
 .font-status .ok { color: #4e6b3a; }
 .font-status .bad { color: #a0472f; }
 .font-status a { color: #6b5532; }
+.grp.single .v { white-space: nowrap; font-size: 13px; line-height: 1; }

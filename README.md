@@ -20,8 +20,8 @@ Dataset of the Backbone of Tangut Linguistics and Philology* (Zenodo). Character
 - Each 小韻 has a button that opens its page in 史金波, 白濱, 黃振華, 《文海研究》 (1983). The book is not
   hosted here: the reader picks their own PDF copy once, and it is kept in their browser (IndexedDB), never uploaded.
 
-- Tangut font switch: Noto Serif Tangut (bundled, SIL OFL), Tangut Yinchuan, BabelStone Tangut Wenhai. The last two
-  are used if installed, or from a font file the reader loads (kept in their browser); they are not hosted here.
+- Tangut font switch: Noto Serif Tangut and BabelStone Tangut Wenhai (both bundled, SIL OFL), and Tangut Yinchuan,
+  which is not redistributable and is used only if installed or loaded from the reader's own file (kept in their browser).
 
 ## Files
 - `index.html`, `style.css`, `app.js`: the page (no build step, no dependencies)
@@ -29,3 +29,4 @@ Dataset of the Backbone of Tangut Linguistics and Philology* (Zenodo). Character
 - `fonts.js`: Tangut font switch
 - `viewer.js`, `vendor/pdfjs/`: page viewer (PDF.js 4.10, Apache License 2.0)
 - `fonts/NotoSerifTangut-subset.woff2`: Noto Serif Tangut, subset to the characters used (SIL Open Font License 1.1)
+- `fonts/BabelStoneTangutWenhai.ttf`: BabelStone Tangut Wenhai v1.002 by Andrew West, unmodified (SIL Open Font License 1.1, see `fonts/BabelStoneTangutWenhai-OFL.txt`)
