@@ -26,7 +26,7 @@ const FONTS = {
 const BASE = '"TangutWeb", "Noto Serif Tangut", var(--cjk)';
 const TEST = '𘀏𗵁𘜶';
 
-// ---- IndexedDB (same store as the page viewer) --------------------------------
+// ---- IndexedDB (fonts the reader loads from a file) ------------------------------
 const DB = 'wenhai-yunjing', STORE = 'files';
 function idb() {
   return new Promise((res, rej) => {
@@ -109,7 +109,12 @@ async function choose(key, save = true) {
   if (pickBtn) pickBtn.onclick = e => { e.preventDefault(); $('#fontFile').dataset.key = key; $('#fontFile').click(); };
 }
 
+async function dropOldPdf() {        // the page viewer has been removed: free its stored PDF
+  try { const db = await idb(); db.transaction(STORE, 'readwrite').objectStore(STORE).delete('wenhai1983'); }
+  catch (e) { /* ignore */ }
+}
 function init() {
+  dropOldPdf();
   const box = $('#fontBox');
   if (!box) return;
   box.innerHTML = Object.entries(FONTS).map(([k, F]) =>
