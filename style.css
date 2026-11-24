@@ -1,7 +1,7 @@
 @font-face {
   font-family: "TangutWeb";
   src: local("Noto Serif Tangut"), local("NotoSerifTangut-Regular"),
-       url("fonts/NotoSerifTangut-subset.woff2?v=2") format("woff2");
+       url("fonts/NotoSerifTangut-subset.woff2?v=3") format("woff2");
   unicode-range: U+16FE0-16FFF, U+17000-187FF, U+18800-18AFF, U+18D00-18D8F;
   font-display: swap;
 }
@@ -215,3 +215,10 @@ body.pv-open { overflow: hidden; }
 .navlink { display: block; margin: -8px 0 16px; padding: 6px 10px; border: 1px solid #d0c8bb; border-radius: 8px;
   background: var(--paper); color: #6b5532; font-size: 13.5px; text-decoration: none; }
 .navlink:hover { background: #fff; color: var(--ink); }
+
+/* ------------------------------------------- non-Wenhai characters, row layouts ---- */
+td.c.nwc .ch { color: #8a7f72; }
+.rn.nwr { border-style: dashed; color: #7d7368; }
+.card-h .tag.nwt { background: #c9b48a; color: #3f3831; }
+.deng.sm { font-size: 11px; white-space: nowrap; padding: 0 2px !important; min-width: 30px; }
+.opts.lay label { display: inline-block; margin-right: 12px; }

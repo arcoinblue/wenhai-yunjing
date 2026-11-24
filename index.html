@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Web韻圖 〜文海〜 · Tangut Wenhai rhyme tables</title>
-<link rel="stylesheet" href="style.css?v=18">
+<link rel="stylesheet" href="style.css?v=19">
 <link rel="icon" href="data:,">
 </head>
 <body>
@@ -20,6 +20,17 @@
       <label for="chartSel">Chart</label>
       <select id="chartSel"></select>
     </div>
+
+    <fieldset class="opts">
+      <legend>Characters</legend>
+      <label><input type="checkbox" id="optWenhaiOnly" checked> Wenhai characters only</label>
+    </fieldset>
+
+    <fieldset class="opts lay">
+      <legend>Rows</legend>
+      <label><input type="radio" name="lay" value="tone" checked> tone → 等</label>
+      <label><input type="radio" name="lay" value="deng"> 等 → tone</label>
+    </fieldset>
 
     <fieldset class="opts fontsel">
       <legend>Tangut font</legend>
@@ -59,8 +70,8 @@
 
     <details class="about">
       <summary>About</summary>
-      <p>Each cell shows one 小韻 (the first in Wenhai order); click it to see every 小韻 placed in that cell, with fanqie, all characters, and readings.</p>
-      <p>Sections: 平開 tone 1 without -w-, 上開 tone 2 without -w-, 平合 tone 1 with -w-, 上合 tone 2 with -w-. Rows (等) follow GHC's medials: 一 no medial i/j, 二 -i-, 三 -j-; 小韻 that fall together share a cell. Charts are ordered by 攝; within a 攝: plain (本), tense (緊), retroflex (捲), long (長), long retroflex (長捲).</p>
+      <p>With “Wenhai characters only” off, characters not in the Wenhai are added in lighter ink: Miyake's rhyme, tone, -w- and initial place them, GHC's reading sets the 等, and characters with the same Miyake reading are grouped as homophones (no fanqie; they come after any Wenhai 小韻 in the cell). Each cell shows one 小韻 (the first in Wenhai order); click it to see every 小韻 placed in that cell, with fanqie, all characters, and readings.</p>
+      <p>Sections, in this order: 平開 tone 1 without -w-, 平合 tone 1 with -w-, 上開 tone 2 without -w-, 上合 tone 2 with -w-. The Rows setting switches to 等 first, with the four sections inside each 等. Rows (等) follow GHC's medials: 一 no medial i/j, 二 -i-, 三 -j-; 小韻 that fall together share a cell. Charts are ordered by 攝; within a 攝: plain (本), tense (緊), retroflex (捲), long (長), long retroflex (長捲).</p>
       <p>Placement uses Miyake's rhyme, grade, initial and medial; tone comes from the part of the Wenhai the entry is in. Tone 2 comes only from the 雜類 (the 上聲 part of the Wenhai is lost).</p>
       <p>Sources: Wenhai entries and MB reconstruction: Mathieu Beaudouin, <a href="https://zenodo.org/search?q=metadata.creators.person_or_org.name:%22Beaudouin,+Mathieu%22" target="_blank" rel="noopener"><i>The Digital Wenhai: A Unicode-Compliant Dataset of the Backbone of Tangut Linguistics and Philology</i></a> (Zenodo). GHC = Gong Hwang-cherng's reconstruction. Marc Miyake, <i>Tangut Database</i> ver. 4.0 (2019). Character meanings: <i>Tangut characters by group</i> v2.0. Tangut fonts: Noto Serif Tangut and BabelStone Tangut Wenhai (Andrew West), both SIL Open Font License, bundled; Tangut Yinchuan (Jing Yongshi / Andrew West), used from your computer or your own copy of the file.</p>
     </details>
@@ -94,7 +105,7 @@
     <div class="pv-hint">Scroll to zoom · drag to move · double-click to zoom in · ← / → turn pages (the book reads right to left)</div>
   </div>
 </div>
-<script src="app.js?v=17"></script>
-<script type="module" src="fonts.js?v=17"></script>
+<script src="app.js?v=19"></script>
+<script type="module" src="fonts.js?v=19"></script>
 </body>
 </html>

@@ -29,6 +29,14 @@ const DISPLAY = COLS.slice().reverse();               // Yunjing: 唇 on the rig
 const SECTIONS = { 1: '平開', 2: '上開', 3: '平合', 4: '上合' };
 const SECDESC = { 1: 'tone 1, no -w-', 2: 'tone 2, no -w-', 3: 'tone 1, -w-', 4: 'tone 2, -w-' };
 const DENG = { 1: '一', 2: '二', 3: '三' };
+const SEC_ORDER = [1, 3, 2, 4];   // 平開, 平合, 上開, 上合: tone 1 sections first, then tone 2
+const ALLCH = () => !$('#optWenhaiOnly').checked;               // include characters not in the Wenhai
+const LAY = () => ((document.querySelector('input[name=lay]:checked') || {}).value === 'deng' ? 'deng' : 'tone');
+const cellIds = (C, key) => {
+  const a = C.cells[key] || [];
+  return ALLCH() ? a.concat((C.cellsX || {})[key] || []) : a;
+};
+const rowOf = (C, rk) => C.rows[rk] || (ALLCH() ? (C.rowsX || {})[rk] : null) || null;
 const NDENG = 3;   // 等 from GHC medials: none = 一, -i- = 二, -j- = 三
 const DENGDESC = { 1: 'no medial i/j (GHC)', 2: 'GHC medial -i-', 3: 'GHC medial -j-' };
 const MGRADE = { 1: 'I', 2: 'II', 3: 'III', 4: 'IV' };
@@ -40,7 +48,7 @@ const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '
 const chars = s => Array.from(s || '');
 
 // ---- load ---------------------------------------------------------------
-fetch('data/wenhai.json?v=17').then(r => r.json()).then(d => {
+fetch('data/wenhai.json?v=19').then(r => r.json()).then(d => {
   D = d;
   charIndex = {};
   for (const [id, g] of Object.entries(D.groups))
@@ -55,6 +63,8 @@ fetch('data/wenhai.json?v=17').then(r => r.json()).then(d => {
   ['#optFanqie', '#optGhc', '#optMb', '#optMiyake', '#optFinal'].forEach(id => $(id).onchange = () => { saveOpts(); render(); });
   document.querySelectorAll('input[name=lang]').forEach(r => r.onchange = () => { saveOpts(); showPanel(); search(); });
   $('#optFit').onchange = () => { saveOpts(); fit(); };
+  $('#optWenhaiOnly').onchange = () => { saveOpts(); render(); showPanel(); search(); };
+  document.querySelectorAll('input[name=lay]').forEach(r => r.onchange = () => { saveOpts(); render(); });
   $('#foldSide').onclick = () => setFold('side', !$('#app').classList.contains('side-folded'));
   $('#foldPanel').onclick = () => setFold('panel', !$('#app').classList.contains('panel-folded'));
   window.addEventListener('resize', () => requestAnimationFrame(fit));
@@ -84,12 +94,15 @@ function loadOpts() {
     $('#optMiyake').checked = !!o.rd; $('#optFinal').checked = o.rf !== false;
     const l = document.querySelector(`input[name=lang][value=${o.lang === 'zh' ? 'zh' : 'en'}]`); if (l) l.checked = true;
     $('#optFit').checked = o.fit !== false;
+    $('#optWenhaiOnly').checked = o.wonly !== false;
+    const ly = document.querySelector(`input[name=lay][value=${o.lay === 'deng' ? 'deng' : 'tone'}]`); if (ly) ly.checked = true;
     setFold('side', !!o.sideF, false); setFold('panel', !!o.panelF, false);
   } catch (e) { /* storage unavailable */ }
 }
 function saveOpts() {
   try { localStorage.setItem('wyj-opts', JSON.stringify({ fq: $('#optFanqie').checked, gh: $('#optGhc').checked, mb: $('#optMb').checked,
     rd: $('#optMiyake').checked, rf: $('#optFinal').checked, lang: LANG(), fit: $('#optFit').checked,
+    wonly: $('#optWenhaiOnly').checked, lay: LAY(),
     sideF: $('#app').classList.contains('side-folded'), panelF: $('#app').classList.contains('panel-folded') })); }
   catch (e) { /* ignore */ }
 }
@@ -149,21 +162,32 @@ function render() {
   DISPLAY.forEach((c, i) => T.push(`<th class="qz ${isGroupStart(i) && i ? 'sep' : ''}" title="Miyake initial: ${esc(c[3])}"><span>${c[2]}</span></th>`));
   T.push('</tr></thead><tbody>');
   // body
-  for (let s = 1; s <= 4; s++) {
-    for (let d = 1; d <= NDENG; d++) {
-      T.push(`<tr class="${d === NDENG ? 'secend' : ''}">`);
-      T.push(`<td class="deng">${DENG[d]}</td>`);
-      const rn = C.rows[`${s}-${d}`];
+  // rows: tone/開合 sections, each with 3 等 (default), or 3 等 groups, each with the 4 sections
+  const ROWS = [];
+  if (LAY() === 'deng') {
+    for (let d = 1; d <= NDENG; d++) SEC_ORDER.forEach((s, j) => ROWS.push({ s, d, first: j === 0, last: j === 3,
+      lab: SECTIONS[s], labTip: SECDESC[s], grp: `${DENG[d]}等`, grpTip: DENGDESC[d], span: 4 }));
+  } else {
+    SEC_ORDER.forEach(s => { for (let d = 1; d <= NDENG; d++) ROWS.push({ s, d, first: d === 1, last: d === NDENG,
+      lab: DENG[d], labTip: DENGDESC[d], grp: SECTIONS[s], grpTip: SECDESC[s], span: NDENG }); });
+  }
+  ROWS.forEach((R, ri) => {
+    {
+      const s = R.s, d = R.d;
+      T.push(`<tr class="${R.last ? 'secend' : ''}">`);
+      T.push(`<td class="deng ${LAY() === 'deng' ? 'sm' : ''}" title="${esc(R.labTip)}">${R.lab}</td>`);
+      const rn = rowOf(C, `${s}-${d}`);
       const rkey = `${s}-${d}`;
-      T.push(`<td class="rowname">${rn ? `<span class="rn ${rn.trad ? 'trad' : ''} ${sel && sel.type === 'row' && sel.key === rkey ? 'sel' : ''}" data-row="${rkey}" title="${esc(rn.wr)} ${esc(rn.gf)}">${esc(rn.c)}</span>${rf && rn.gf ? `<span class="rf">${esc(rn.gf)}</span>` : ''}` : ''}</td>`);
+      T.push(`<td class="rowname">${rn ? `<span class="rn ${rn.trad ? 'trad' : ''} ${rn.nw ? 'nwr' : ''} ${sel && sel.type === 'row' && sel.key === rkey ? 'sel' : ''}" data-row="${rkey}" title="${esc(rn.wr)} ${esc(rn.gf)}">${esc(rn.c)}</span>${rf && rn.gf ? `<span class="rf">${esc(rn.gf)}</span>` : ''}` : ''}</td>`);
       DISPLAY.forEach((c, i) => {
         const key = `${s}-${d}-${c[0]}`;
-        const ids = C.cells[key];
+        const ids = cellIds(C, key); const any = ids.length > 0;
         const cls = ['c']; if (isGroupStart(i) && i) cls.push('sep');
-        if (ids) cls.push('has');
+        if (any) cls.push('has');
+        if (any && D.groups[ids[0]].nw) cls.push('nwc');
         if (sel && sel.type === 'cell' && sel.key === key) cls.push('sel');
         let inner;
-        if (ids) {
+        if (any) {
           const g = D.groups[ids[0]];
           inner = `<span class="ch">${esc(g.rep)}</span>`;
           if (fq) inner += `<span class="fq">${esc(speller(g.fanqie))}</span>`;
@@ -172,13 +196,13 @@ function render() {
           if (rd) inner += `<span class="rd">${esc(reading(g.miyake))}</span>`;
           if (ids.length > 1) inner += '<span class="mark"></span>';
         } else inner = '<span class="o"></span>';
-        T.push(`<td class="${cls.join(' ')}" ${ids ? `data-cell="${key}"` : ''}>${inner}</td>`);
+        T.push(`<td class="${cls.join(' ')}" ${any ? `data-cell="${key}"` : ''}>${inner}</td>`);
       });
-      if (d === 1) T.push(`<td class="seclab" rowspan="${NDENG}" title="${SECDESC[s]}"><div class="vt">${SECTIONS[s]}</div></td>`);
-      if (s === 1 && d === 1) T.push(`<td class="title" rowspan="${4 * NDENG}"><div class="vt">${esc(C.title)}　${esc(C.sheCN)}${esc(C.blockLabel)}</div></td>`);
+      if (R.first) T.push(`<td class="seclab" rowspan="${R.span}" title="${esc(R.grpTip)}"><div class="vt">${R.grp}</div></td>`);
+      if (ri === 0) T.push(`<td class="title" rowspan="${ROWS.length}"><div class="vt">${esc(C.title)}　${esc(C.sheCN)}${esc(C.blockLabel)}</div></td>`);
       T.push('</tr>');
     }
-  }
+  });
   T.push('</tbody>');
   const t = $('#chart');
   t.innerHTML = T.join('');
@@ -242,7 +266,8 @@ function rhymeLine(g) {
 }
 function cardHTML(id, idx, total) {
   const g = D.groups[id];
-  const tag = g.shown ? '<span class="tag">in chart</span>' : '<span class="tag hid">not shown</span>';
+  const tag = (idx === 1 ? '<span class="tag">in chart</span>' : '<span class="tag hid">not shown</span>') +
+    (g.nw ? ' <span class="tag nwt">not in the Wenhai</span>' : '');
   // the representative is shown in the card header, so it is left out of the list below
   let ri = g.m.findIndex(m => m.c === g.rep); if (ri < 0) ri = 0;
   const rep = g.m[ri], others = g.m.filter((_, i) => i !== ri);
@@ -256,17 +281,17 @@ function cardHTML(id, idx, total) {
   }).join('');
   return `<div class="card">
     <div class="card-h"><span class="big">${esc(g.rep)}</span>
-      <div class="info">小韻 ${idx} / ${total} ${tag}<br>Wenhai ${posLink(rep.pos)} · ${esc(rep.lfw)} · ${esc(g.part)}
+      <div class="info">${g.nw ? 'Homophones' : '小韻'} ${idx} / ${total} ${tag}<br>${g.nw ? esc(rep.lfw) : `Wenhai ${posLink(rep.pos)} · ${esc(rep.lfw)} · ${esc(g.part)}`}
         ${gloss(rep) ? `<br><span class="hgl">${esc(gloss(rep))}</span>` : ''}</div></div>
     <dl class="kv">
-      <dt>Fanqie</dt><dd>${fanqieHTML(g.fanqie)}</dd>
+      ${g.nw ? '' : `<dt>Fanqie</dt><dd>${fanqieHTML(g.fanqie)}</dd>`}
       <dt>Rhyme</dt><dd>${rhymeLine(g)}</dd>
       <dt>GHC</dt><dd>${esc(g.ghc)}</dd>
-      <dt>MB</dt><dd>${esc(g.mb)}</dd>
+      ${g.nw ? '' : `<dt>MB</dt><dd>${esc(g.mb)}</dd>`}
       <dt>Miyake</dt><dd>${esc(g.miyake)}</dd>
       <dt>Characters</dt><dd>${g.m.length}</dd>
     </dl>
-    ${others.length ? `<table class="mem"><thead><tr><th></th><th>字</th><th>${LANG() === 'zh' ? '字義' : 'Meaning'}</th><th>LFW · Wenhai</th></tr></thead>
+    ${others.length ? `<table class="mem"><thead><tr><th></th><th>字</th><th>${LANG() === 'zh' ? '字義' : 'Meaning'}</th><th>${g.nw ? 'LFW' : 'LFW · Wenhai'}</th></tr></thead>
       <tbody>${rows}</tbody></table>` : ''}
     ${g.flag ? `<div class="flag">⚠ ${esc(g.flag)}</div>` : ''}
   </div>`;
@@ -289,17 +314,18 @@ function showPanel() {
   }
   if (sel.type === 'cell') {
     const [s, d, k] = sel.key.split('-');
-    const ids = C.cells[sel.key] || [];
+    const ids = cellIds(C, sel.key);
     P.innerHTML = slotTitle(+s, +d, k) + ids.map((id, i) => cardHTML(id, i + 1, ids.length)).join('');
   } else {
     const [s, d] = sel.key.split('-');
-    const rn = C.rows[sel.key];
+    const rn = rowOf(C, sel.key);
     if (!rn) { P.innerHTML = ''; return; }
-    const n = Object.keys(C.cells).filter(k => k.startsWith(sel.key + '-')).length;
+    const n = [...new Set(Object.keys(C.cells).concat(ALLCH() ? Object.keys(C.cellsX || {}) : []))]
+      .filter(k => k.startsWith(sel.key + '-')).length;
     P.innerHTML = `<div class="slot-h">${esc(C.title)} · ${SECTIONS[s]} · ${DENG[d]}等</div>
       <div class="slot-sub">${SECDESC[s]} · ${DENGDESC[d]} · ${n} cell(s) filled</div>
       <div class="card"><div class="card-h"><span class="rn rhyme-big ${rn.trad ? 'trad' : ''}">${esc(rn.c)}</span>
-        <div class="info">${rn.trad ? 'Wenhai rhyme name' : 'No Wenhai rhyme name (上聲 lost);<br>first 小韻 of the row'}</div></div>
+        <div class="info">${rn.trad ? 'Wenhai rhyme name' : rn.nw ? 'No Wenhai entries in this row;<br>first homophone group (not in the Wenhai)' : 'No Wenhai rhyme name (上聲 lost);<br>first 小韻 of the row'}</div></div>
       <dl class="kv"><dt>GHC final</dt><dd><b>${esc(rn.gf || '—')}</b></dd>
       <dt>Wenhai rhyme</dt><dd>${esc(rn.wr || '—')}${rn.all && rn.all !== rn.wr ? ` (row also has ${esc(rn.all)})` : ''}</dd>
       <dt>Source</dt><dd>${esc(rn.src)}</dd></dl></div>` +
@@ -352,9 +378,13 @@ function search() {
   [...hits].slice(0, 80).forEach(([id, m]) => {
     const g = D.groups[id];
     const li = document.createElement('li');
-    const where = g.chart ? `chart ${g.chart} · ${SECTIONS[g.sec]} · ${DENG[g.deng]}等 · ${COLMAP[g.col][3]}${g.shown ? '' : ' (not shown)'}` : 'not placed';
+    const where = (g.chart ? `chart ${g.chart} · ${SECTIONS[g.sec]} · ${DENG[g.deng]}等 · ${COLMAP[g.col][3]}${g.shown || g.nw ? '' : ' (not shown)'}` : 'not placed') +
+      (g.nw ? ' · <i>not in the Wenhai</i>' : '');
     li.innerHTML = `<span class="tg">${esc(m.c)}</span><span class="meta">${esc(m.ghc)} · ${esc(gloss(m))}<br>${where}</span>`;
-    if (g.chart) li.onclick = () => go(g.chart, { type: 'cell', key: `${g.sec}-${g.deng}-${g.col}` });
+    if (g.chart) li.onclick = () => {
+      if (g.nw && !ALLCH()) { $('#optWenhaiOnly').checked = false; saveOpts(); }
+      go(g.chart, { type: 'cell', key: `${g.sec}-${g.deng}-${g.col}` });
+    };
     ul.appendChild(li);
   });
   if (!hits.size) ul.innerHTML = '<li class="meta">no match</li>';

@@ -8,8 +8,8 @@ Dataset of the Backbone of Tangut Linguistics and Philology* (Zenodo). Character
 
 **Site:** https://arcoinblue.github.io/wenhai-yunjing/
 
-- 39 charts, ordered by 攝; each chart has four sections: 平開 (tone 1, no -w-), 上開 (tone 2, no -w-),
-  平合 (tone 1, -w-), 上合 (tone 2, -w-), each with three 等 rows set by GHC's medials (一: no i/j, 二: -i-, 三: -j-).
+- 39 charts, ordered by 攝; each chart has four sections: 平開 (tone 1, no -w-), 平合 (tone 1, -w-),
+  上開 (tone 2, no -w-), 上合 (tone 2, -w-), each with three 等 rows set by GHC's medials (一: no i/j, 二: -i-, 三: -j-).
 - Columns follow the nine Tangut initial classes (九音), labelled with their Tangut names.
 - Each cell shows one 小韻 (first in Wenhai order). Click a cell to see every 小韻 placed there, with
   fanqie, GHC / MB / Miyake readings, and every member character with its meaning (English or Chinese),
@@ -26,6 +26,10 @@ Dataset of the Backbone of Tangut Linguistics and Philology* (Zenodo). Character
 
 - Tangut font switch: Noto Serif Tangut and BabelStone Tangut Wenhai (both bundled, SIL OFL), and Tangut Yinchuan,
   which is not redistributable and is used only if installed or loaded from the reader's own file (kept in their browser).
+
+- Options: **Wenhai characters only** (on by default). Off adds the characters not in the Wenhai (2,867 from
+  *Tangut characters by group* v2.0), placed by Miyake's rhyme, tone, -w- and initial with the 等 from GHC, and grouped
+  as homophones by Miyake reading. **Rows**: tone → 等 (default) or 等 → tone (three 等 groups of four sections).
 
 ## Files
 - `index.html`, `style.css`, `app.js`: the page (no build step, no dependencies)
