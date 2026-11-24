@@ -18,6 +18,10 @@ Dataset of the Backbone of Tangut Linguistics and Philology* (Zenodo). Character
   half-folio on the right, with zoom, pan and page turning. Images: `pages/<folio>-<side>.jpg` (e.g. `05-1`, `M02-1`).
 - Click a row roundel for rhyme details. Search by character, reading, Li Fanwen number or Wenhai position.
 - Links are shareable: `#c=<chart>&s=<section>-<grade>-<initial>`.
+- **Verb stem pairs** (`pairs.html`): every character marked [ᴀ] or [ʙ] in *Tangut characters by group* v2.0, paired
+  stem A ~ stem B and grouped by how the GHC final alternates (or listed by meaning), with GHC / MB / Miyake readings,
+  English / Chinese meanings and the Wenhai position where the character is in the Wenhai. MB is blank for characters
+  the Digital Wenhai does not have; tentative pairs are marked, and forms with no partner are listed at the end.
 
 
 - Tangut font switch: Noto Serif Tangut and BabelStone Tangut Wenhai (both bundled, SIL OFL), and Tangut Yinchuan,
@@ -26,6 +30,7 @@ Dataset of the Backbone of Tangut Linguistics and Philology* (Zenodo). Character
 ## Files
 - `index.html`, `style.css`, `app.js`: the page (no build step, no dependencies)
 - `data/wenhai.json`: generated data (charts, 小韻, members, rhymes)
+- `pairs.html`, `pairs.css`, `pairs.js`, `data/pairs.json`: the verb stem pairs page and its data
 - `pages/`: Wenhai page images, one per folio side (2400 px, grayscale); sides with no surviving text have none
 - `fonts.js`: Tangut font switch
 - `fonts/NotoSerifTangut-subset.woff2`: Noto Serif Tangut, subset to the characters used (SIL Open Font License 1.1)

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Verb stem pairs · Web韻圖 〜文海〜</title>
+<link rel="stylesheet" href="style.css?v=18">
+<link rel="stylesheet" href="pairs.css?v=1">
+<link rel="icon" href="data:,">
+</head>
+<body class="pairs-page">
+<div id="pairsApp">
+  <aside id="pside">
+    <a class="back" href="./">‹ Rhyme tables</a>
+    <h1>Verb stem pairs<br><span class="sub">〜文海〜</span></h1>
+    <p class="tagline">Tangut verbs with two stems, A and B, grouped by how the final alternates (GHC)</p>
+
+    <fieldset class="opts">
+      <legend>Arrange</legend>
+      <label><input type="radio" name="view" value="pattern" checked> by alternation</label>
+      <label><input type="radio" name="view" value="meaning"> by meaning</label>
+    </fieldset>
+
+    <fieldset class="opts lang">
+      <legend>Meanings</legend>
+      <label><input type="radio" name="lang" value="en" checked> English</label>
+      <label><input type="radio" name="lang" value="zh"> 中文</label>
+    </fieldset>
+
+    <fieldset class="opts fontsel">
+      <legend>Tangut font</legend>
+      <div id="fontBox"></div>
+    </fieldset>
+
+    <nav id="toc"></nav>
+
+    <details class="about">
+      <summary>About</summary>
+      <p>Every character whose gloss is marked [ᴀ] or [ʙ] in <i>Tangut characters by group</i> v2.0, paired by meaning and checked against the readings (same initial, alternating final). Groups are named by the GHC final with medials and vowel diacritics set aside; each row shows the exact readings.</p>
+      <p><span class="wtag">Wenhai</span> marks characters found in the Wenhai, with their position. GHC is Gong Hwang-cherng's reconstruction (as on the rhyme tables); MB is from Mathieu Beaudouin's <i>Digital Wenhai</i> and is blank for characters it does not have; Miyake is <i>Tangut Database</i> ver. 4.0 (2019).</p>
+      <p>A pair marked <span class="tent">?</span> is tentative. Forms with no partner are listed at the end.</p>
+    </details>
+  </aside>
+
+  <main id="pmain"><p class="muted">Loading…</p></main>
+</div>
+<script src="pairs.js?v=1"></script>
+<script type="module" src="fonts.js?v=17"></script>
+</body>
+</html>
