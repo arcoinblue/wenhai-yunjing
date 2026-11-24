@@ -40,7 +40,7 @@ const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '
 const chars = s => Array.from(s || '');
 
 // ---- load ---------------------------------------------------------------
-fetch('data/wenhai.json?v=13').then(r => r.json()).then(d => {
+fetch('data/wenhai.json?v=17').then(r => r.json()).then(d => {
   D = d;
   charIndex = {};
   for (const [id, g] of Object.entries(D.groups))
@@ -48,7 +48,7 @@ fetch('data/wenhai.json?v=13').then(r => r.json()).then(d => {
   const sel_ = $('#chartSel');
   D.charts.forEach(c => {
     const o = document.createElement('option');
-    o.value = c.n; o.textContent = `${c.n}. ${c.sheCN}${c.blockLabel} (${c.sheName})`;
+    o.value = c.n; o.textContent = `${c.n}. ${c.sheCN}${c.blockLabel} (${c.fin || c.sheName})`;
     sel_.appendChild(o);
   });
   sel_.onchange = () => go(+sel_.value);
@@ -134,7 +134,7 @@ function render() {
   const T = [];
   // header row 1: nav + 九音 names
   T.push('<thead><tr>');
-  T.push(`<th colspan="2" rowspan="2" class="corner"><button class="navbtn" data-nav="-1" title="previous chart">&lt;</button><br>${esc(C.sheCN)}<br>${esc(C.blockLabel)}</th>`);
+  T.push(`<th colspan="2" rowspan="2" class="corner"><button class="navbtn" data-nav="-1" title="previous chart">&lt;</button><br>${esc(C.sheCN)}<br>${esc(C.blockLabel)}<br><span class="cfin">${esc(C.fin || '')}</span></th>`);
   groupsOfDisplay().forEach((g, i) => {
     const K = CLASSES[g.cls];
     const tip = `${g.cls}. ${K.tg} ${K.tr} (${K.zh}): ${K.en}`;
@@ -282,7 +282,7 @@ function showPanel() {
   const C = D.charts[cur - 1];
   if (!sel) {
     P.innerHTML = `<div class="slot-h">${esc(C.title)} ${esc(C.sheCN)}${esc(C.blockLabel)}</div>
-      <div class="slot-sub">攝 ${C.she} (${esc(C.sheName)}) · ${BLOCKEN[C.block]} · Miyake rhymes ${C.rhymes.join(', ')}</div>` +
+      <div class="slot-sub">攝 ${C.she} · ${BLOCKEN[C.block]} <b>${esc(C.fin || C.sheName)}</b> · Miyake rhymes ${C.rhymes.join(', ')}</div>` +
       C.rhymes.map(r => rhymeCard(r)).join('') +
       '<p class="placeholder">Click a character in the chart to see its 小韻.<br>Click a row name (roundel) for the rhyme of that row.</p>';
     return;

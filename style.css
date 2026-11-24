@@ -210,3 +210,4 @@ body.pv-open { overflow: hidden; }
 #pvLoad[hidden] { display: none; }
 .pv-hint { padding: 4px 10px; font-size: 11.5px; color: var(--ink-soft); text-align: center; border-top: 1px solid var(--circle); }
 @media (max-width: 700px) { #pageView { padding: 0; } .pv-box { border-radius: 0; } .pv-hint { display: none; } }
+.corner .cfin { font: 12px Georgia, serif; color: var(--ink-soft); white-space: nowrap; }
