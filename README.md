@@ -17,7 +17,8 @@ Dataset of the Backbone of Tangut Linguistics and Philology* (Zenodo). Character
 - Click a Wenhai position (e.g. `93.121`) to open that page of the Wenhai: transcription on the left, facsimile
   half-folio on the right, with zoom, pan and page turning. Images: `pages/<folio>-<side>.jpg` (e.g. `05-1`, `M02-1`).
 - Click a row roundel for rhyme details. Search by character, reading, Li Fanwen number or Wenhai position.
-- Links are shareable: `#c=<chart>&s=<section>-<grade>-<initial>`.
+- Links are shareable: `tables.html#c=<chart>&s=<section>-<grade>-<initial>` (older links to the site root with the same
+  `#c=…` are forwarded to `tables.html`).
 - **Verb stem pairs** (`pairs.html`): every character marked [ᴀ] or [ʙ] in *Tangut characters by group* v2.0, paired
   stem A ~ stem B and grouped by how the GHC final alternates (or listed by meaning), with GHC / MB / Miyake readings,
   English / Chinese meanings and the Wenhai position where the character is in the Wenhai. MB is blank for characters
@@ -32,7 +33,8 @@ Dataset of the Backbone of Tangut Linguistics and Philology* (Zenodo). Character
   as homophones by Miyake reading. **Rows**: tone → 等 (default) or 等 → tone (three 等 groups of four sections).
 
 ## Files
-- `index.html`, `style.css`, `app.js`: the page (no build step, no dependencies)
+- `index.html`: the main page, linking to the rhyme tables and the verb stem pairs
+- `tables.html`, `style.css`, `app.js`: the rhyme tables (no build step, no dependencies)
 - `data/wenhai.json`: generated data (charts, 小韻, members, rhymes)
 - `pairs.html`, `pairs.css`, `pairs.js`, `data/pairs.json`: the verb stem pairs page and its data
 - `pages/`: Wenhai page images, one per folio side (2400 px, grayscale); sides with no surviving text have none
