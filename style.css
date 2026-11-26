@@ -222,3 +222,6 @@ td.c.nwc .ch { color: #8a7f72; }
 .card-h .tag.nwt { background: #c9b48a; color: #3f3831; }
 .deng.sm { font-size: 11px; white-space: nowrap; padding: 0 2px !important; min-width: 30px; }
 .opts.lay label { display: inline-block; margin-right: 12px; }
+
+.card a.cmp { display: block; margin: 2px 12px 10px; font: 13px Georgia, var(--cjk); color: #6b5532; text-decoration: none; }
+.card a.cmp:hover { text-decoration: underline; color: var(--ink); }

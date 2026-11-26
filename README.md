@@ -24,6 +24,13 @@ Dataset of the Backbone of Tangut Linguistics and Philology* (Zenodo). Character
   English / Chinese meanings and the Wenhai position where the character is in the Wenhai. MB is blank for characters
   the Digital Wenhai does not have; tentative pairs are marked, and forms with no partner are listed at the end.
 
+- **Rhyme reconstructions** (`rhymes.html`): the 105 rhymes laid out by 攝, lax ~ tense ~ rhotic (the site author's
+  table), with GHC and Beaudouin (2023) shown by default and Gong Xun, Gong Xun 2020, Miyake (2006), Arakawa (2006),
+  Nishida (1964), Sofronov (1968, two stages) and the Tibetan / Sanskrit transcriptions as options. GHC, GX and Miyake
+  follow the site author's table; everything else is from Mathieu Beaudouin, *Grammaire du tangoute. Phonologie et
+  morphologie* (thèse, INALCO, 2023), “Reconstruction des rimes du tangoute”. Click a rhyme number for every reading,
+  Beaudouin's analysis (initial, medial, phonation), the chart and row in the rhyme tables, and verb stems with that
+  rhyme. Links: `rhymes.html#r=<rhyme>`.
 
 - Tangut font switch: Noto Serif Tangut and BabelStone Tangut Wenhai (both bundled, SIL OFL), and Tangut Yinchuan,
   which is not redistributable and is used only if installed or loaded from the reader's own file (kept in their browser).
@@ -37,6 +44,7 @@ Dataset of the Backbone of Tangut Linguistics and Philology* (Zenodo). Character
 - `tables.html`, `style.css`, `app.js`: the rhyme tables (no build step, no dependencies)
 - `data/wenhai.json`: generated data (charts, 小韻, members, rhymes)
 - `pairs.html`, `pairs.css`, `pairs.js`, `data/pairs.json`: the verb stem pairs page and its data
+- `rhymes.html`, `rhymes.css`, `rhymes.js`, `data/rhymes.json`: the rhyme reconstructions page and its data
 - `pages/`: Wenhai page images, one per folio side (2400 px, grayscale); sides with no surviving text have none
 - `fonts.js`: Tangut font switch
 - `fonts/NotoSerifTangut-subset.woff2`: Noto Serif Tangut, subset to the characters used (SIL Open Font License 1.1)

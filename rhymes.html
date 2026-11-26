@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rhyme reconstructions · Web韻圖 〜文海〜</title>
+<link rel="stylesheet" href="style.css?v=20">
+<link rel="stylesheet" href="pairs.css?v=1">
+<link rel="stylesheet" href="rhymes.css?v=1">
+<link rel="icon" href="data:,">
+</head>
+<body class="pairs-page rhymes-page">
+<div id="pairsApp" class="rhymesApp">
+  <aside id="pside">
+    <a class="back" href="./">‹ The Tangut Wenhai</a>
+    <h1>Rhyme reconstructions<br><span class="sub">〜文海〜</span></h1>
+    <p class="tagline">The 105 Tangut rhymes by 攝, lax ~ tense ~ rhotic, with the reconstructions side by side</p>
+
+    <fieldset class="opts sys">
+      <legend>Reconstructions</legend>
+      <div id="sysBox"></div>
+      <div class="sysbtns"><button type="button" data-set="def">GHC + MB</button><button type="button" data-set="all">all</button></div>
+    </fieldset>
+
+    <fieldset class="opts sys">
+      <legend>Transcriptions</legend>
+      <div id="trBox"></div>
+    </fieldset>
+
+    <fieldset class="opts">
+      <legend>Show</legend>
+      <label><input type="checkbox" id="optTones" checked> Wenhai rhymes (平 · 上)</label>
+    </fieldset>
+
+    <fieldset class="opts fontsel">
+      <legend>Tangut font</legend>
+      <div id="fontBox"></div>
+    </fieldset>
+
+    <div class="legend rlegend">
+      <div><span class="sw shade"></span> second-column rhymes (Beaudouin: geminate or pre-glottalised initial)</div>
+      <div><span class="sw dif">-x</span> differs from Beaudouin's table (hover to see his value)</div>
+      <div>Click a rhyme number for every reading, Beaudouin's analysis, the rhyme tables and verb stems.</div>
+    </div>
+
+    <details class="about">
+      <summary>About</summary>
+      <p>Rows are 攝 (Roman: the 12 攝 of the rhyme tables; Arabic: Beaudouin's 8). In each 攝, the lax (major-cycle) rhymes come first, with the second-column rhymes shaded below the dashed line; tense (minor cycle 1) and rhotic (minor cycles 2 and 3) rhymes sit on the row of their lax counterpart. A rhyme split over two rows has one reading per row.</p>
+      <p><b>GHC</b>, <b>GX</b> and <b>Miy</b> are as in the table compiled for this site. All other columns, and Beaudouin's analysis (initial, medial, phonation), are from Mathieu Beaudouin, <i>Grammaire du tangoute. Phonologie et morphologie</i>, thèse, INALCO, 2023, “Reconstruction des rimes du tangoute”, a first draft that he expects to revise. His <b>MB</b> column is the PHONO column there: ʶ = uvularised (grades I and II), ʕ with -ɹ- = grade II, ˞ = rhoticised (minor cycle 2), a̯(C-) = pre-vocalised syllable (minor cycle 1), Cː- = geminate initial (second column).</p>
+      <p>Sources of the reconstructions: Nishida Tatsuo 西田龍雄, 西夏語の研究 (1964–1966); Michail V. Sofronov, <i>Грамматика тангутского языка</i> (1968), two stages of the language; Gong Hwang-cherng 龔煌城, “The Phonological Reconstruction of Tangut through Examination of Phonological Alternations”, <i>BIHP</i> 60(1), 1989; Gong Xun (several works; <a href="https://homepage.univie.ac.at/xun.gong/tangut/phonology-202409.html" target="_blank" rel="noopener">Tangut phonology, 2024</a>); Arakawa Shintarō 荒川慎太郎 &amp; Evgenij Kychanov, <i>Словарь тангутского (Си Ся) языка</i> (2006); Marc Miyake, <a href="https://www.amritas.com/" target="_blank" rel="noopener">Amritas</a> (2006). Rhyme-name characters and counts: the rhyme tables of this site.</p>
+    </details>
+  </aside>
+
+  <main id="pmain"><p class="muted">Loading…</p></main>
+
+  <aside id="rpanel" hidden>
+    <button id="rclose" class="rclose" title="Close" aria-label="Close">×</button>
+    <div id="rbody"></div>
+  </aside>
+</div>
+<script src="rhymes.js?v=1"></script>
+<script type="module" src="fonts.js?v=17"></script>
+</body>
+</html>

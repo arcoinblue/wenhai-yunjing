@@ -344,7 +344,8 @@ function rhymeCard(r) {
     <dt>Miyake</dt><dd>${esc(R.final)}</dd>
     <dt>Wenhai</dt><dd>${names || '—'}</dd>
     <dt>Grades</dt><dd>${gr}</dd>
-    <dt>Characters</dt><dd>${R.n} in Miyake's database</dd></dl></div>`;
+    <dt>Characters</dt><dd>${R.n} in Miyake's database</dd></dl>
+    <a class="cmp" href="rhymes.html#r=${r}">Compare reconstructions of rhyme ${r} ›</a></div>`;
 }
 
 // ---- search -------------------------------------------------------------
