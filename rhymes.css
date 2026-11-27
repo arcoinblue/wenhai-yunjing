@@ -62,11 +62,6 @@ table.rv { border-collapse: collapse; width: 100%; font-size: 14px; }
 .golink { display: block; margin: 6px 0; padding: 7px 10px; border: 1px solid #d0c8bb; border-radius: 8px; background: var(--card);
   color: #6b5532; font: 13.5px Georgia, var(--cjk); text-decoration: none; }
 .golink:hover { background: #fff; color: var(--ink); }
-.vb { display: flex; gap: 8px; align-items: baseline; padding: 3px 0; border-bottom: 1px solid #eee7db; font-size: 13px; }
-.vb .tg { font-size: 22px; flex: none; }
-.vb .st { font: 600 11px Georgia, serif; color: var(--ink-soft); }
-.vb .r { font-family: var(--ipa); font-size: 14px; }
-.vb .g { color: #4a433c; font-family: Georgia, var(--cjk); }
 .muted2 { color: var(--ink-soft); font: 12.5px Georgia, serif; }
 
 @media (max-width: 1100px) {
