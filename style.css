@@ -8,6 +8,7 @@
 :root {
   --cjk: "Noto Serif TC", "Noto Serif CJK TC", "Source Han Serif TC", "Songti TC", "PMingLiU", "MingLiU", serif;
   --tg: "TangutWeb", "Tangut Yinchuan", "Noto Serif Tangut", var(--cjk);
+  --tg-fixed: "TangutWeb", "Noto Serif Tangut", var(--cjk);   /* not changed by the font switch */
   --cell: 42px;
   --row: 50px;
   /* soft, paper-like palette */
@@ -96,7 +97,7 @@ input[type=search] { font-family: var(--tg); }
   color: var(--ink); font-size: 15px; cursor: pointer; }
 .navbtn:hover { background: #e9e2d5; }
 .corner { font-size: 19px; color: #4a433c; }
-.grp { height: 48px; font-family: var(--tg); font-size: 21px; padding: 0 6px !important; cursor: help; }
+.grp { height: 48px; font-family: var(--tg-fixed); font-size: 21px; padding: 0 6px !important; cursor: help; }
 .grp .spread { display: flex; justify-content: space-between; }
 .grp.single { font-size: 14px; line-height: 1.05; }
 .grp.single .v { writing-mode: vertical-rl; display: inline-block; }
