@@ -41,6 +41,14 @@ Dataset of the Backbone of Tangut Linguistics and Philology* (Zenodo). Character
   shows its reading (GHC, GX, Miyake or MB) and gloss; the Tangut, reading and gloss lines can be copied. Named
   drafts are kept in the browser.
 
+- **Character groups** (`groups.html`): characters grouped by (1) sound, (2) character and (3) meaning. Sound is a
+  gate after Gong Hwang-cherng's alternations: same or aspiration/voicing-related initials; the same rhyme, or a change
+  of grade, length or cycle (lax ~ tense ~ rhotic) within one 攝, or a change of 攝 attested in the verb stem pairs, or
+  oral ~ nasal; tone and -w- may differ. Character: shared runs of radicals inside the blocks of Downes's codes, weighted
+  by rarity. Meaning: closest English or Chinese senses by ConceptNet Numberbatch 17.06 embeddings. Four ways to group
+  (all three; sound + meaning; sound + character; sound + either), with every link shown, and a view of all links of one
+  character (`groups.html#ch=<character>`). Data built by `tools/build_groups.py`.
+
 - Tangut font switch: Noto Serif Tangut and BabelStone Tangut Wenhai (both bundled, SIL OFL), and Tangut Yinchuan,
   which is not redistributable and is used only if installed or loaded from the reader's own file (kept in their browser).
 
@@ -59,6 +67,8 @@ Dataset of the Backbone of Tangut Linguistics and Philology* (Zenodo). Character
 - `data/tangut.json`: all 6,175 characters and 18,042 words of the Tangut Character Dictionary v2.2 (readings, meanings,
   radical codes, Wenhai positions; MB readings from the Digital Wenhai), the 176 radicals and the reduced groups;
   `img/rad/*.png`: the radical pictures from the same dictionary
+- `groups.html`, `groups.css`, `groups.js`, `data/groups.json`: the character groups page and its data;
+  `tools/build_groups.py`, `tools/groups_lib.py`: the build (needs Numberbatch 17.06 en/zh rows, see the script)
 - `pages/`: Wenhai page images, one per folio side (2400 px, grayscale); sides with no surviving text have none
 - `fonts.js`: Tangut font switch
 - `fonts/WenhaiSerif-*.woff2`: Latin, IPA and Cyrillic text face, a subset of Charis 7.000 by SIL Global, renamed as the SIL Open Font License requires for modified versions (see `fonts/Charis-OFL.txt`)

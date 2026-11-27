@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Character groups · Web韻圖 〜文海〜</title>
+<link rel="stylesheet" href="site.css?v=30">
+<link rel="stylesheet" href="pairs.css?v=30">
+<link rel="stylesheet" href="groups.css?v=1">
+<link rel="icon" href="data:,">
+</head>
+<body class="shell groups-page">
+<header class="site">
+  <a class="brand" href="./"><span class="zh">文海</span><span class="en">The Tangut Wenhai</span></a>
+  <nav>
+    <a href="tables.html">Rhyme tables</a>
+    <a href="rhymes.html">Rhymes</a>
+    <a href="pairs.html">Stem pairs</a>
+    <a href="practice.html">Radical codes</a>
+    <a href="write.html">Write</a>
+    <a href="groups.html" aria-current="page">Groups</a>
+  </nav>
+  <details class="display"><summary>Display</summary><div class="menu">
+    <fieldset class="opts fontsel"><legend>Tangut font</legend><div id="fontBox"></div></fieldset>
+    <fieldset class="opts row"><legend>Meanings</legend>
+      <label><input type="radio" name="lang" value="en" checked> English</label>
+      <label><input type="radio" name="lang" value="zh"> 中文</label>
+    </fieldset>
+  </div></details>
+</header>
+<div id="groupsApp" class="page split">
+  <aside id="gside" class="controls">
+    <h1>Character groups</h1>
+
+    <fieldset class="opts">
+      <legend>Group by</legend>
+      <label><input type="radio" name="mode" value="pgm" checked> sound + character + meaning</label>
+      <label><input type="radio" name="mode" value="pm"> sound + meaning</label>
+      <label><input type="radio" name="mode" value="pg"> sound + character</label>
+      <label><input type="radio" name="mode" value="any"> sound + character or meaning</label>
+      <span class="side-note">Sound is always required: every two members of a group are phonetically related.</span>
+    </fieldset>
+
+    <fieldset class="opts row">
+      <legend>Order</legend>
+      <label><input type="radio" name="sort" value="size" checked> size</label>
+      <label><input type="radio" name="sort" value="score"> score</label>
+      <label><input type="radio" name="sort" value="she"> 攝</label>
+    </fieldset>
+
+    <div class="ctl">
+      <label for="q">Find</label>
+      <input id="q" type="search" placeholder="𗯗, lej2, change, 变" autocomplete="off">
+      <div class="hint">A character, a GHC reading (plain letters, tone optional) or a meaning. Click any character for all its links.</div>
+    </div>
+
+    <nav id="toc"></nav>
+
+    <details class="about">
+      <summary>About</summary>
+      <p>Pairs of characters are compared by three criteria, in this order.</p>
+      <p><b>1. Sound</b> (Gong Hwang-cherng's alternations, GHC readings; a pair is only compared further when this holds). Initials: the same, or differing in aspiration or voicing within one series (p ~ pʰ ~ b, l ~ lʰ, x ~ ɣ …). Finals: the same rhyme; or another rhyme of the same 攝: a change of grade (medial), of length, or of cycle (lax ~ tense ~ rhotic); or a change of 攝 attested in the verb stem pairs (<span id="altList"></span>) or oral ~ nasal. Tone and -w- may also differ. Each change lowers the weight.</p>
+      <p><b>2. Character</b> (Downes's radical codes): the runs of two or more radicals the two codes share inside a block (a hyphen-separated part), weighted by how rare each run is, as a share of the smaller code; single shared radicals count a little. Shared runs are <mark class="gp">marked</mark> in the codes.</p>
+      <p><b>3. Meaning</b>: the closest pair of senses in the two glosses, English or Chinese, by cosine in ConceptNet Numberbatch 17.06 word embeddings (the same sense counts 1). Transcription notes and surnames are not senses, so characters glossed only that way have no meaning score.</p>
+      <p>A link counts for a criterion at <span id="thr"></span>. Groups are formed from the strongest links first; two groups are joined only when every pair across them is phonetically related and at least half of those pairs are links of the chosen kind.</p>
+      <p>Characters are the 5,934 placed in the rhyme tables (Wenhai and non-Wenhai). Built by <span class="mono">tools/build_groups.py</span>.</p>
+    </details>
+  </aside>
+
+  <main id="gmain"><p class="muted">Loading…</p></main>
+</div>
+<script src="groups.js?v=1"></script>
+<script type="module" src="fonts.js?v=30"></script>
+</body>
+</html>
