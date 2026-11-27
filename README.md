@@ -41,11 +41,11 @@ Dataset of the Backbone of Tangut Linguistics and Philology* (Zenodo). Character
   shows its reading (GHC, GX, Miyake or MB) and gloss; the Tangut, reading and gloss lines can be copied. Named
   drafts are kept in the browser.
 
-- **Character groups** (`groups.html`): characters grouped by (1) sound, (2) character and (3) meaning. Sound is a
+- **Character groups** (`groups.html`, provisional: generated automatically, not checked by hand): characters grouped by (1) sound, (2) character and (3) meaning. Sound is a
   gate after Gong Hwang-cherng's *Phonological Alternations in Tangut* (1988): the same initial, or voiced ~ voiceless
   aspirated, or unaspirated ~ aspirated; the same rhyme, or a change of grade, length or cycle (lax ~ tense ~ rhotic)
   within one 攝, or a change of 攝 found in Gong's examples (`tools/gong1988.json`: the rhyme numbers of his 286
-  examples) or the verb stem pairs, or oral ~ nasal; tone and -w- may differ. Character: shared runs of radicals inside the blocks of Downes's codes, weighted
+  examples) or the verb stem pairs; tone and -w- may differ. Character: shared runs of radicals inside the blocks of Downes's codes, weighted
   by rarity. Meaning: closest English or Chinese senses by ConceptNet Numberbatch 17.06 embeddings. Grouped by sound → meaning →
   character by default (meaning required, shared radical runs raise the score), or all three required, or sound +
   character, with every link shown, and a view of all links of one

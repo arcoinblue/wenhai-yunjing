@@ -10,7 +10,7 @@ conceptnet-numberbatch-17-06-300.gz, released through gensim-data on GitHub).
    Gong (1988, §2): voiced ~ voiceless aspirated, or unaspirated ~ aspirated voiceless; the finals are the same
    rhyme, or alternate within one 攝 (grade / medial, short ~ long, or across the three cycles lax ~ tense ~
    rhotic), or alternate between two 攝 as in Gong (1988, tools/gong1988.json) or the verb stem pairs (the exact
-   rhyme pair attested weighs more), or oral ~ nasal; tone and -w- may differ. Each change lowers the weight.
+   rhyme pair attested weighs more); tone and -w- may differ. Each change lowers the weight.
 2. Graphic: Downes's radical codes; shared runs of two or more radicals inside a block (hyphen-separated part),
    single radicals counting 0.3, each weighted by rarity (idf), as a share of the smaller character.
 3. Meaning: best cosine between any English sense or any Chinese sense of the two glosses (Numberbatch); the same

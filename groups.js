@@ -135,7 +135,7 @@
 
   function render() {
     const { mode, G, sort } = list();
-    let html = charPanel();
+    let html = `<p class="provnote"><b>Provisional.</b> These groups are generated automatically from readings, radical codes and glosses, and have not been checked by hand. Links are candidates for relatedness, not established cognates; the criteria and thresholds may still change.</p>` + charPanel();
     const total = G.reduce((s, g) => s + g.m.length, 0);
     html += `<p class="muted gsum">${G.length} group${G.length === 1 ? '' : 's'} · ${total} characters · ${esc(mode.label)}</p>`;
     let toc = `<div class="toc-h">Groups <span class="n">${G.length}</span></div>`;
@@ -195,6 +195,6 @@
   let t = null;
   $('#q').oninput = () => { clearTimeout(t); t = setTimeout(() => { shown = PAGE; render(); }, 200); };
   window.onhashchange = () => { if (/(^#|&)ch=/.test(location.hash)) { render(); $('#gmain').scrollTop = 0; } };
-  fetch('data/groups.json?v=3').then(r => r.json()).then(d => { prep(d); render(); })
+  fetch('data/groups.json?v=4').then(r => r.json()).then(d => { prep(d); render(); })
     .catch(e => { console.error(e); $('#gmain').innerHTML = '<p class="muted">Could not load data/groups.json.</p>'; });
 })();

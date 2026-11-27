@@ -81,7 +81,7 @@ def characters(T, W, R):
 
 # ---- phonetic relation (Gong Hwang-cherng's alternations) ----------------------------------------
 # Cross-攝 vowel alternations: those in Gong (1988, tools/gong1988.json) and in the verb stem pairs
-# (data/pairs.json), plus oral ~ nasal (攝 II ~ III, IV ~ V).  ABL: 攝 pair -> sources; ATT: the exact rhyme
+# (data/pairs.json); no others.  ABL: 攝 pair -> sources; ATT: the exact rhyme
 # pairs attested in either, which weigh more than the same change between other rhymes of the two 攝.
 def she_alternations(P, C, R):
     pos = rhyme_places(R)
@@ -100,8 +100,6 @@ def she_alternations(P, C, R):
             a, b = C.get(p['a']), C.get(p['b'])
             if a and b: add(a['rh'], b['rh'], 'stem pairs')
     return ABL, ATT
-
-NASAL = {(1, 2), (3, 4)}
 
 def final_rel(a, b, ALT):
     """(weight, [labels]) for the finals of two characters, or None."""
@@ -126,8 +124,6 @@ def final_rel(a, b, ALT):
                 labs.append(f"-{SHE_VOWEL[k[0]]} ~ -{SHE_VOWEL[k[1]]} (R.{lo} ~ R.{hi})"); wgt *= 0.8
             else:
                 labs.append(f"-{SHE_VOWEL[k[0]]} ~ -{SHE_VOWEL[k[1]]}"); wgt *= 0.65
-        elif k in NASAL:
-            labs.append('oral ~ nasal'); wgt *= 0.55
         else:
             return None
         if a['cyc'] != b['cyc']:

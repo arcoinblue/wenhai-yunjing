@@ -44,3 +44,10 @@ table.lt { margin-top: 4px; }
   table.pt.lt.cp { width: 900px; }
   .grp, .cpanel { overflow-x: auto; }
 }
+
+/* provisional status */
+.controls h1 .prov { font: 400 var(--fs-xs)/1 var(--serif); color: var(--warn); border: 1px solid currentColor;
+  border-radius: var(--r); padding: 2px 5px; vertical-align: 3px; margin-left: 4px; letter-spacing: .02em; }
+.provnote { max-width: 1200px; margin: 0 auto 14px; padding: 7px 12px; font-size: var(--fs-s); line-height: 1.45;
+  color: var(--ink-2); background: var(--warn-wash); border-left: 3px solid var(--warn); }
+.provnote b { color: var(--warn); }
