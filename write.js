@@ -176,7 +176,7 @@
     $('#count').textContent = count;
     if (results.length === 1 && results[0].all) {
       const units = results[0].all;
-      $('#res').innerHTML = `<button type="button" class="res sel" data-i="0" style="max-width:none;flex-direction:row;gap:10px;align-items:center">
+      $('#res').innerHTML = `<button type="button" class="res sel wide" data-i="0">
         <span class="t">${esc(units.map(u => u.t).join(''))}</span><span class="g">add ${units.length} word${units.length > 1 ? 's' : ''} <span class="kbd">Enter</span></span></button>`;
       return;
     }

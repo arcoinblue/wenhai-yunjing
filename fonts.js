@@ -7,7 +7,7 @@
 const FONTS = {
   noto: {
     name: 'Noto Serif Tangut', family: null,
-    note: 'Google Noto, SIL Open Font License. Built in.',
+    note: 'Google Noto, SIL Open Font License.',
   },
   yinchuan: {
     name: 'Tangut Yinchuan', family: 'TGYinchuan',
@@ -96,9 +96,9 @@ async function choose(key, save = true) {
   st.innerHTML = '…';
   const how = await register(key);
   apply(key, !!how);
-  const label = { builtin: 'built in', bundled: 'built in', installed: 'installed on this computer', loaded: 'loaded from your file' }[how];
+  const label = { installed: 'Installed on this computer. ', loaded: 'Loaded from your file. ' }[how] || '';
   if (how) {
-    st.innerHTML = `<span class="ok">✓ ${F.name} (${label})</span><br>${F.note}` +
+    st.innerHTML = `${label}${F.note}` +
       (how === 'loaded' ? ` <a href="#" id="fontReplace">replace file</a>` : '');
   } else {
     st.innerHTML = `${F.name} is not installed here. <a href="${F.url}" target="_blank" rel="noopener">Get it from BabelStone</a>, ` +
@@ -113,8 +113,15 @@ async function dropOldPdf() {        // the page viewer has been removed: free i
   try { const db = await idb(); db.transaction(STORE, 'readwrite').objectStore(STORE).delete('wenhai1983'); }
   catch (e) { /* ignore */ }
 }
+function closeMenus(e) {
+  document.querySelectorAll('details.display[open]').forEach(d => {
+    if (e.type === 'keydown' ? e.key === 'Escape' : !d.contains(e.target)) d.open = false;
+  });
+}
 function init() {
   dropOldPdf();
+  document.addEventListener('click', closeMenus);
+  document.addEventListener('keydown', closeMenus);
   const box = $('#fontBox');
   if (!box) return;
   box.innerHTML = Object.entries(FONTS).map(([k, F]) =>

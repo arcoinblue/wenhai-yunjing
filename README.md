@@ -50,7 +50,8 @@ Dataset of the Backbone of Tangut Linguistics and Philology* (Zenodo). Character
 
 ## Files
 - `index.html`: the main page, linking to the rhyme tables and the verb stem pairs
-- `tables.html`, `style.css`, `app.js`: the rhyme tables (no build step, no dependencies)
+- `site.css`: shared base for every page (colours, type, header, controls); each page adds its own stylesheet
+- `tables.html`, `tables.css`, `app.js`: the rhyme tables
 - `data/wenhai.json`: generated data (charts, 小韻, members, rhymes)
 - `pairs.html`, `pairs.css`, `pairs.js`, `data/pairs.json`: the verb stem pairs page and its data
 - `rhymes.html`, `rhymes.css`, `rhymes.js`, `data/rhymes.json`: the rhyme reconstructions page and its data
@@ -60,5 +61,6 @@ Dataset of the Backbone of Tangut Linguistics and Philology* (Zenodo). Character
   `img/rad/*.png`: the radical pictures from the same dictionary
 - `pages/`: Wenhai page images, one per folio side (2400 px, grayscale); sides with no surviving text have none
 - `fonts.js`: Tangut font switch
+- `fonts/WenhaiSerif-*.woff2`: Latin, IPA and Cyrillic text face, a subset of Charis 7.000 by SIL Global, renamed as the SIL Open Font License requires for modified versions (see `fonts/Charis-OFL.txt`)
 - `fonts/NotoSerifTangut.woff2`: Noto Serif Tangut, all Tangut characters (SIL Open Font License 1.1)
 - `fonts/BabelStoneTangutWenhai.ttf`: BabelStone Tangut Wenhai v1.002 by Andrew West, unmodified (SIL Open Font License 1.1, see `fonts/BabelStoneTangutWenhai-OFL.txt`)

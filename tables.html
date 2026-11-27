@@ -4,21 +4,46 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Web韻圖 〜文海〜 · Tangut Wenhai rhyme tables</title>
-<link rel="stylesheet" href="style.css?v=22">
+<link rel="stylesheet" href="site.css?v=30">
+<link rel="stylesheet" href="tables.css?v=30">
 <link rel="icon" href="data:,">
 </head>
-<body>
-<div id="app">
-  <aside id="side">
+<body class="shell tables-page">
+<header class="site">
+  <a class="brand" href="./"><span class="zh">文海</span><span class="en">The Tangut Wenhai</span></a>
+  <nav>
+    <a href="tables.html" aria-current="page">Rhyme tables</a>
+    <a href="rhymes.html">Rhymes</a>
+    <a href="pairs.html">Stem pairs</a>
+    <a href="practice.html">Radical codes</a>
+    <a href="write.html">Write</a>
+  </nav>
+  <details class="display"><summary>Display</summary><div class="menu">
+    <fieldset class="opts fontsel"><legend>Tangut font</legend><div id="fontBox"></div></fieldset>
+    <fieldset class="opts row"><legend>Meanings</legend>
+      <label><input type="radio" name="lang" value="en" checked> English</label>
+      <label><input type="radio" name="lang" value="zh"> 中文</label>
+    </fieldset>
+  </div></details>
+</header>
+<div id="app" class="page">
+  <aside id="side" class="controls">
     <button id="foldSide" class="fold" title="Hide sidebar">‹</button>
     <div class="side-in">
-    <h1>Web韻圖<br><span class="sub">〜文海〜</span></h1>
-    <p class="tagline">Yunjing-style rhyme tables of the Tangut <i>Wenhai</i>, with Gong Hwang-cherng, MB and Miyake (2019) readings</p>
-    <a class="navlink" href="./">‹ The Tangut Wenhai</a>
+    <h1>Web韻圖 <span class="sub">〜文海〜</span></h1>
 
     <div class="ctl">
       <label for="chartSel">Chart</label>
       <select id="chartSel"></select>
+    </div>
+
+    <div class="ctl">
+      <label for="q">Search</label>
+      <div class="search">
+        <input id="q" type="search" placeholder="𘀏 · kʰu¹ · khu · L3909 · 05.131" autocomplete="off">
+      </div>
+      <div class="hint">Character, reading (GHC, MB, Miyake), Li Fanwen no., Wenhai position or meaning</div>
+      <ul id="results"></ul>
     </div>
 
     <fieldset class="opts">
@@ -26,21 +51,10 @@
       <label><input type="checkbox" id="optWenhaiOnly" checked> Wenhai characters only</label>
     </fieldset>
 
-    <fieldset class="opts lay">
+    <fieldset class="opts row">
       <legend>Rows</legend>
       <label><input type="radio" name="lay" value="tone" checked> tone → 等</label>
       <label><input type="radio" name="lay" value="deng"> 等 → tone</label>
-    </fieldset>
-
-    <fieldset class="opts fontsel">
-      <legend>Tangut font</legend>
-      <div id="fontBox"></div>
-    </fieldset>
-
-    <fieldset class="opts lang">
-      <legend>Meanings</legend>
-      <label><input type="radio" name="lang" value="en" checked> English</label>
-      <label><input type="radio" name="lang" value="zh"> 中文</label>
     </fieldset>
 
     <fieldset class="opts">
@@ -53,14 +67,6 @@
       <label><input type="checkbox" id="optFit" checked> fit chart to window</label>
     </fieldset>
 
-    <div class="ctl">
-      <label for="q">Search</label>
-      <div class="search">
-        <input id="q" type="search" placeholder="𘀏 · kʰu¹ · khu · L3909 · 05.131" autocomplete="off">
-      </div>
-      <div class="hint">Tangut character, GHC, MB or Miyake reading, Li Fanwen no., Wenhai position, or a meaning (English / 中文)</div>
-      <ul id="results"></ul>
-    </div>
 
     <div class="legend">
       <div><span class="rn trad">𘁨</span> Wenhai rhyme-name character</div>
@@ -105,7 +111,7 @@
     <div class="pv-hint">Scroll to zoom · drag to move · double-click to zoom in · ← / → turn pages (the book reads right to left)</div>
   </div>
 </div>
-<script src="app.js?v=20"></script>
-<script type="module" src="fonts.js?v=19"></script>
+<script src="app.js?v=30"></script>
+<script type="module" src="fonts.js?v=30"></script>
 </body>
 </html>
