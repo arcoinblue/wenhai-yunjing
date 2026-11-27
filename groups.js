@@ -14,7 +14,7 @@
     const o = opt();
     const set = (n, v) => { const el = document.querySelector(`input[name=${n}][value="${v}"]`); if (el) el.checked = true; };
     set('lang', o.lang === 'zh' ? 'zh' : 'en');
-    if (o.grpMode) set('mode', o.grpMode);
+    if (o.grpMode && document.querySelector(`input[name=mode][value="${o.grpMode}"]`)) set('mode', o.grpMode);
     if (o.grpSort) set('sort', o.grpSort);
   }
   function saveOpts() {
@@ -195,6 +195,6 @@
   let t = null;
   $('#q').oninput = () => { clearTimeout(t); t = setTimeout(() => { shown = PAGE; render(); }, 200); };
   window.onhashchange = () => { if (/(^#|&)ch=/.test(location.hash)) { render(); $('#gmain').scrollTop = 0; } };
-  fetch('data/groups.json?v=1').then(r => r.json()).then(d => { prep(d); render(); })
+  fetch('data/groups.json?v=2').then(r => r.json()).then(d => { prep(d); render(); })
     .catch(e => { console.error(e); $('#gmain').innerHTML = '<p class="muted">Could not load data/groups.json.</p>'; });
 })();

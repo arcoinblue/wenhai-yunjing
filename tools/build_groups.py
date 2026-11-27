@@ -16,7 +16,9 @@ conceptnet-numberbatch-17-06-300.gz, released through gensim-data on GitHub).
 3. Meaning: best cosine between any English sense or any Chinese sense of the two glosses (Numberbatch); the same
    sense counts 1.0. Transcription notes and surnames are not senses.
 
-Groups are made for four modes by complete linkage on the phonetic gate (every two members of a group must be
+Order (decided): sound is the gate, meaning is required, character raises the score ('smc'). Two other modes
+are kept for comparison: all three required ('all'), and sound + character ('sc', which mostly finds
+phonetic-component series). Groups are made for each mode by complete linkage on the phonetic gate (every two members of a group must be
 phonetically related) over the links that satisfy the mode.
 """
 import sys, json, collections, itertools
@@ -55,11 +57,10 @@ def main():
     print('phonetic pairs', len(cand), 'links kept', len(links))
 
     def related(x, y): return frozenset((x, y)) in cand
-    MODES = {
-        'pgm': ('sound + character + meaning', lambda l: l['g'] >= TG and l['m'] >= TM, lambda l: l['p'] * (l['g'] + l['m']) / 2),
-        'pm':  ('sound + meaning', lambda l: l['m'] >= TM, lambda l: l['p'] * (l['m'] + 0.25 * l['g'])),
-        'pg':  ('sound + character', lambda l: l['g'] >= TG, lambda l: l['p'] * (l['g'] + 0.25 * l['m'])),
-        'any': ('sound + character or meaning', lambda l: l['g'] >= TG or l['m'] >= TM, lambda l: l['p'] * max(l['g'], l['m'])),
+    MODES = {   # sound is the gate for all; the default is sound -> meaning -> character
+        'smc': ('sound → meaning → character', lambda l: l['m'] >= TM, lambda l: l['p'] * (l['m'] + 0.5 * l['g'])),
+        'all': ('sound + meaning + character (all required)', lambda l: l['g'] >= TG and l['m'] >= TM, lambda l: l['p'] * (l['g'] + l['m']) / 2),
+        'sc':  ('sound + character (component series)', lambda l: l['g'] >= TG, lambda l: l['p'] * (l['g'] + 0.25 * l['m'])),
     }
     chars = sorted({x for l in links for x in (l['a'], l['b'])}, key=lambda c: (C[c]['she'], C[c]['rh'], C[c]['col'], c))
     ix = {c: i for i, c in enumerate(chars)}

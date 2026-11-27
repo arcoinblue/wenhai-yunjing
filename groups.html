@@ -6,7 +6,7 @@
 <title>Character groups · Web韻圖 〜文海〜</title>
 <link rel="stylesheet" href="site.css?v=30">
 <link rel="stylesheet" href="pairs.css?v=30">
-<link rel="stylesheet" href="groups.css?v=1">
+<link rel="stylesheet" href="groups.css?v=2">
 <link rel="icon" href="data:,">
 </head>
 <body class="shell groups-page">
@@ -34,11 +34,10 @@
 
     <fieldset class="opts">
       <legend>Group by</legend>
-      <label><input type="radio" name="mode" value="pgm" checked> sound + character + meaning</label>
-      <label><input type="radio" name="mode" value="pm"> sound + meaning</label>
-      <label><input type="radio" name="mode" value="pg"> sound + character</label>
-      <label><input type="radio" name="mode" value="any"> sound + character or meaning</label>
-      <span class="side-note">Sound is always required: every two members of a group are phonetically related.</span>
+      <label><input type="radio" name="mode" value="smc" checked> sound → meaning → character</label>
+      <label><input type="radio" name="mode" value="all"> all three required</label>
+      <label><input type="radio" name="mode" value="sc"> sound + character <span class="side-note">component series</span></label>
+      <span class="side-note">Sound is always required: every two members of a group are phonetically related. By default meaning is required too, and shared radical runs raise a link's score.</span>
     </fieldset>
 
     <fieldset class="opts row">
@@ -58,7 +57,7 @@
 
     <details class="about">
       <summary>About</summary>
-      <p>Pairs of characters are compared by three criteria, in this order.</p>
+      <p>Pairs of characters are compared by three criteria, in this order: sound decides which pairs are compared at all, meaning decides which of them are linked, and character raises the score of a link (it is not required, since only about half of the attested verb stem pairs share a radical run). The other two settings require all three, or group by sound and character alone, which mostly brings out series of characters sharing a component and a reading.</p>
       <p><b>1. Sound</b> (Gong Hwang-cherng's alternations, GHC readings; a pair is only compared further when this holds). Initials: the same, or differing in aspiration or voicing within one series (p ~ pʰ ~ b, l ~ lʰ, x ~ ɣ …). Finals: the same rhyme; or another rhyme of the same 攝: a change of grade (medial), of length, or of cycle (lax ~ tense ~ rhotic); or a change of 攝 attested in the verb stem pairs (<span id="altList"></span>) or oral ~ nasal. Tone and -w- may also differ. Each change lowers the weight.</p>
       <p><b>2. Character</b> (Downes's radical codes): the runs of two or more radicals the two codes share inside a block (a hyphen-separated part), weighted by how rare each run is, as a share of the smaller code; single shared radicals count a little. Shared runs are <mark class="gp">marked</mark> in the codes.</p>
       <p><b>3. Meaning</b>: the closest pair of senses in the two glosses, English or Chinese, by cosine in ConceptNet Numberbatch 17.06 word embeddings (the same sense counts 1). Transcription notes and surnames are not senses, so characters glossed only that way have no meaning score.</p>
@@ -69,7 +68,7 @@
 
   <main id="gmain"><p class="muted">Loading…</p></main>
 </div>
-<script src="groups.js?v=1"></script>
+<script src="groups.js?v=2"></script>
 <script type="module" src="fonts.js?v=30"></script>
 </body>
 </html>

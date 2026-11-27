@@ -92,6 +92,8 @@ def she_alternations(P, C):
     return alt
 
 NASAL = {(1, 2), (3, 4)}
+# Further cross-攝 alternations (e.g. from Gong 1988), as pairs of 攝 indices (0 = 攝 I -u … 11 = 攝 XII):
+EXTRA_ALT = set()
 
 def final_rel(a, b, ABL):
     """(weight, [labels]) for the finals of two characters, or None."""
@@ -109,7 +111,7 @@ def final_rel(a, b, ABL):
                 labs.append('grade'); wgt *= 0.85
     else:
         k = tuple(sorted((a['she'], b['she'])))
-        if k in ABL:
+        if k in ABL or k in EXTRA_ALT:
             labs.append(f"-{SHE_VOWEL[k[0]]} ~ -{SHE_VOWEL[k[1]]}"); wgt *= 0.7
         elif k in NASAL:
             labs.append('oral ~ nasal'); wgt *= 0.6
