@@ -46,7 +46,11 @@ Dataset of the Backbone of Tangut Linguistics and Philology* (Zenodo). Character
   aspirated, or unaspirated ~ aspirated; the same rhyme, or a change of grade, length or cycle (lax ~ tense ~ rhotic)
   within one 攝, or a change of 攝 found in Gong's examples (`tools/gong1988.json`: the rhyme numbers of his 286
   examples) or the verb stem pairs; tone and -w- may differ. Character: shared runs of radicals inside the blocks of Downes's codes, weighted
-  by rarity. Meaning: closest English or Chinese senses by ConceptNet Numberbatch 17.06 embeddings. Grouped by sound → meaning →
+  by rarity. Meaning, by levels of evidence: the same English sense, a WordNet synonym, the same Chinese word (glosses
+  segmented with jieba) or a synonym compound among the dictionary's words; a WordNet broader/narrower term or close
+  ConceptNet Numberbatch 17.06 embeddings only when the Chinese glosses or the compounds agree; embeddings alone never
+  make a link; later senses and long glosses count less. Groups are arranged by their main alternation (Gong's order:
+  initials, medials, finals, tones; homophone-only groups apart) and rated by their weakest link. Grouped by sound → meaning →
   character by default (meaning required, shared radical runs raise the score), or all three required, or sound +
   character, with every link shown, and a view of all links of one
   character (`groups.html#ch=<character>`). Data built by `tools/build_groups.py`.

@@ -179,78 +179,221 @@ class Graphic:
         return round(min(1.0, s / m), 3), keep
 
 # ---- meaning relation ------------------------------------------------------------------------------------
-TRANS = re.compile(r'(also )?(used to )?transcribes? [^;]*|\bsurname\b|\bphonetic\b|\bfor transcription\b|\bplace ?name\b', re.I)
+# Meaning is judged by levels of evidence, not by one similarity score:
+#   strong  the same English sense; a WordNet synonym (with embeddings ≥ 0.35); the same Chinese word; a
+#           synonym compound (AB is a dictionary word meaning what A or B means, the other being close).
+#           A single shared Chinese character needs English embeddings ≥ 0.3. Compounds that are names, and
+#           Chinese glosses of the type 虫名 'name of an insect', are not used.
+#   medium  a WordNet broader/narrower term, or English embeddings ≥ 0.7 where WordNet does not know both
+#           words, which count only when something else agrees: the Chinese glosses (embeddings ≥ 0.75 or a
+#           shared content character), A and B forming a compound, parallel compounds (AX and BX are words with
+#           the same meaning), or two or more shared compound partners
+#   weak    embeddings alone: never a link, they only add to the score
+# Polysemy: a match on a later sense (after ';') counts 0.85, and a gloss of n > 2 senses counts √(2/n).
+TRANS = re.compile(r'(also )?(used to )?transcribes? [^;]*|(also )?used (in|for) transcription[^;/]*|\bsurname\b|\bphonetic\b|\bfor transcription\b|\bplace ?name\b', re.I)
+BAD = {'?', 'unknown', 'meaning unknown', 'unclear', 'name', ''}
 
 def senses_en(en):
+    """[(rank, sense)]: rank = index of the ';'-separated sense; '/' separates near-synonyms of one sense."""
     en = re.sub(r'\[[ᴀʙ]\]', '', en or '')
     en = re.sub(r'[₀-₉]', '', en)
-    out = []
-    for part in re.split(r'[;/]', en):
-        part = TRANS.sub('', part)
-        part = re.sub(r'\([^)]*\)', '', part).strip(' ,.').lower()
-        part = re.sub(r'^(a|an|the|to) ', '', part)
-        part = re.sub(r'^(a )?kind of ', '', part)
-        part = re.sub(r'^name of (a |an )?', '', part)
-        if part and part not in ('?', 'unknown', 'meaning unknown', 'unclear'): out.append(part)
+    out, rank = [], 0
+    for grp in en.split(';'):
+        got = False
+        for part in grp.split('/'):
+            part = TRANS.sub('', part)
+            part = re.sub(r'\([^)]*\)', '', part).strip(' ,.').lower()
+            part = re.sub(r'^(a|an|the|to) ', '', part)
+            if re.match(r'^((a )?kind of|name of|a sort of|type of) ', part): continue   # species: only the class is known
+            if part not in BAD: out.append((rank, part)); got = True
+        if got: rank += 1
     return out
 
-def senses_zh(zh):
+ZSTOP = set('的之者所也其而以于与及等名某种类用语词一个人物是为有不')
+
+def senses_zh(zh, seg):
+    """(words, content characters, number of senses) of a Chinese gloss; transcriptions 【…】 left out."""
     zh = re.sub(r'【[^】]*】', '', zh or '')
-    zh = re.sub(r'[₀-₉\[\]ᴀʙ]|\d+\.', '', zh)
-    return [s.strip() for s in re.split(r'[，,、;；/\s]+', zh) if s.strip() and s.strip() not in ('？', '?')]
+    zh = re.sub(r'（[^）]*）|\([^)]*\)', '', zh)
+    zh = re.sub(r'\d+\.', '', zh)
+    zh = re.sub(r'[^\u4e00-\u9fff，,、;；/\s]', '', zh)       # keep Chinese characters and separators only
+    parts = [p for p in re.split(r'[，,、;；/\s]+', zh) if p and '名' not in p]   # 虫名, 树名…: species, class only
+    words = set()
+    for p in parts:
+        for w in seg(p):
+            if len(w) > 1 and w not in seg.known: words.update(w)    # unknown run of single words (船舟): split
+            elif len(w) > 1 or len(p) <= 4: words.add(w)            # single characters only from short items,
+                                                                     # not from explanations (也可加在之后)
+    words = {w for w in words if w not in ZSTOP}
+    chars = {ch for p in parts for ch in p if ch not in ZSTOP and '一' <= ch <= '鿿'}
+    return words, chars, max(1, len(parts))
 
 STOP = set('a an the of to in on at for with by from and or be as one oneself someone something sth sb its it his her their up out off into'.split())
 NB_DIR = Path('/home/claude/dl')   # ConceptNet Numberbatch 17.06 (en + zh rows), see build_groups.py
 
+class Segmenter:
+    def __init__(self):
+        import jieba, logging
+        jieba.setLogLevel(logging.WARNING)
+        self.jieba = jieba; jieba.initialize()
+        self.known = {w for w, f in jieba.dt.FREQ.items() if f > 0}
+        self.cache = {}
+    def __call__(self, s):
+        if s not in self.cache: self.cache[s] = self.jieba.lcut(s, HMM=False)
+        return self.cache[s]
+
+NAME = re.compile(r'\bname\b|transcri|surname|courtesy|reign|title|place|county|prefecture|mountain|river|sutra|dhāraṇī|mantra', re.I)
+
+class Compounds:
+    """Evidence from the words (two characters) of the Tangut Character Dictionary v2.2."""
+    def __init__(self, T):
+        self.word = {}                                   # frozenset(A, B) -> (word, en, zh)
+        self.part = collections.defaultdict(dict)        # A -> {(position, X): (word, en, zh)}
+        for w, (g, x, en, zh) in T['w'].items():
+            if len(w) != 2 or w[0] == w[1]: continue
+            if NAME.search(en or '') or re.search(r'[A-Z]', re.sub(r'\([^)]*\)', '', en or '')): continue   # names
+            a, b = w
+            self.word.setdefault(frozenset((a, b)), (w, en, zh))
+            self.part[a][(0, b)] = (w, en, zh); self.part[b][(1, a)] = (w, en, zh)
+
 class Meaning:
-    """Meaning similarity from ConceptNet Numberbatch 17.06 word embeddings (Speer et al.), for the
-    English glosses and, separately, the Chinese glosses; an identical sense counts 1.0.
-    Score = the best cosine over all sense pairs, English or Chinese."""
-    def __init__(self, C, nb_dir=NB_DIR):
+    def __init__(self, C, T, nb_dir=NB_DIR):
         import numpy as np
-        self.np = np
+        from nltk.corpus import wordnet as wn
+        self.np, self.wn = np, wn
+        self.seg = Segmenter()
+        self.K = Compounds(T)
         self.S = {c: senses_en(x['en']) for c, x in C.items()}
-        self.Z = {c: senses_zh(x['zh']) for c, x in C.items()}
+        self.NS = {c: max([r for r, _ in v], default=-1) + 1 for c, v in self.S.items()}
+        self.Z = {c: senses_zh(x['zh'], self.seg) for c, x in C.items()}
+        self.gl = {c: (x['en'], x['zh']) for c, x in C.items()}
+        en_terms = {s for v in self.S.values() for _, s in v}
+        for (w, en, zh) in self.K.word.values():
+            en_terms.update(s for _, s in senses_en(en))
+        zh_terms = {w for v in self.Z.values() for w in v[0]}
         self.vec = {}
-        for lang, senses in (('en', {s for v in self.S.values() for s in v}), ('zh', {s for v in self.Z.values() for s in v})):
+        for lang, terms in (('en', en_terms), ('zh', zh_terms)):
             words = (nb_dir / f'nb_{lang}.txt').read_text().split('\n')
             M = np.load(nb_dir / f'nb_{lang}.npy', mmap_mode='r')
             idx = {w: i for i, w in enumerate(words)}
             def look(t):
                 i = idx.get(t)
                 return None if i is None else np.asarray(M[i], dtype=np.float32)
-            for s in senses:
-                if lang == 'en':
-                    v = look(s.replace(' ', '_'))
-                    if v is None:
-                        ws = [w for w in re.findall(r"[a-z]+", s) if w not in STOP] or re.findall(r"[a-z]+", s)
-                        vs = [x for x in (look(w) for w in ws) if x is not None]
-                        v = np.mean(vs, axis=0) if vs else None
-                else:
-                    v = look(s)          # whole Chinese terms only: character averages are too noisy
+            for s in terms:
+                v = look(s.replace(' ', '_'))
+                if v is None and lang == 'en':
+                    ws = [w for w in re.findall(r"[a-z]+", s) if w not in STOP] or re.findall(r"[a-z]+", s)
+                    vs = [x for x in (look(w) for w in ws) if x is not None]
+                    v = np.mean(vs, axis=0) if vs else None
                 if v is not None:
                     n = np.linalg.norm(v)
                     if n: self.vec[(lang, s)] = v / n
+        self.syn, self.near = {}, {}
+        for s in en_terms:
+            t = re.sub(r'^be ', '', s).replace(' ', '_')
+            ss = wn.synsets(t)[:3]
+            if ss:
+                self.syn[s] = set(ss)
+                nr = set()
+                for x in ss: nr |= set(x.hypernyms()) | set(x.hyponyms()) | set(x.similar_tos()) | set(x.verb_groups())
+                self.near[s] = nr
         self.cache = {}
 
-    def pair(self, lang, s, t):
+    def cos(self, lang, s, t):
         if s == t: return 1.0
-        k = (lang, s, t) if s < t else (lang, t, s)
+        a, b = self.vec.get((lang, s)), self.vec.get((lang, t))
+        return float(a @ b) if a is not None and b is not None else 0.0
+
+    def en_pair(self, s, t):
+        """(base, kind) for two English senses."""
+        if s == t: return 1.0, 'same sense'
+        k = (s, t) if s < t else (t, s)
         if k not in self.cache:
-            a, b = self.vec.get((lang, s)), self.vec.get((lang, t))
-            self.cache[k] = float(a @ b) if a is not None and b is not None else 0.0
-        return self.cache[k]
+            r = (0.0, '')
+            c = self.cos('en', s, t)
+            # a WordNet relation through a rare sense (firm ~ house, vary ~ depart) is checked against the embeddings
+            if s in self.syn and t in self.syn and c >= 0.35:
+                if self.syn[s] & self.syn[t]: r = (0.95, 'WordNet synonym')
+                elif (self.near[s] & self.syn[t]) or (self.near[t] & self.syn[s]): r = (0.8, 'WordNet broader/narrower')
+            # embeddings stand in only where WordNet cannot judge: if it knows both words and finds them
+            # neither synonyms nor broader/narrower (e.g. two ~ five, east ~ west), they are left at that
+            known = s in self.syn and t in self.syn
+            if not r[1]: r = (c, 'embeddings' if not known else 'embeddings (WordNet: unrelated)')
+            self.cache[k] = (r[0], r[1], c)
+        return self.cache[k][:2]
+
+    def same_meaning(self, g1, g2):
+        """Two compound glosses (en, zh) with the same meaning?"""
+        s1, s2 = senses_en(g1[0]), senses_en(g2[0])
+        for _, s in s1:
+            for _, t in s2:
+                if s == t or self.cos('en', s, t) >= 0.8: return True
+        z1 = re.sub(r'[^一-鿿]', '', g1[1] or ''); z2 = re.sub(r'[^一-鿿]', '', g2[1] or '')
+        return bool(z1) and z1 == z2
+
+    def compound(self, a, b):
+        """(kind, evidence, strong?) from the dictionary's words, or None."""
+        w = self.K.word.get(frozenset((a, b)))
+        if w:
+            sa, sb, sw = senses_en(self.gl[a][0]), senses_en(self.gl[b][0]), senses_en(w[1])
+            def same(x): return any(s == t or self.en_pair(s, t)[1] == 'WordNet synonym' for _, s in x for _, t in sw)
+            def close(x): return any(s == t or self.cos('en', s, t) >= 0.6 for _, s in x for _, t in sw)
+            if sw and ((same(sa) and close(sb)) or (same(sb) and close(sa))):
+                return 'synonym compound', f'{w[0]} {w[1]}', True
+            return 'compound', f'{w[0]} {w[1]}', False
+        Pa, Pb = self.K.part.get(a, {}), self.K.part.get(b, {})
+        shared = [k for k in Pa.keys() & Pb.keys() if k[1] not in (a, b)]
+        for k in shared:
+            wa, wb = Pa[k], Pb[k]
+            if self.same_meaning(wa[1:], wb[1:]):
+                # corroboration only: parallel compounds also join co-hyponyms (fourth ~ seventh child)
+                return 'parallel compounds', f'{wa[0]} = {wb[0]} {wa[1]}', False
+        if len(shared) >= 2:
+            return 'shared compound partners', ' '.join(sorted(Pa[k][0] for k in shared)[:3]), False
+        return None
 
     def rel(self, a, b):
-        """(score, how, (sense a, sense b))"""
-        best = (0.0, '', ('', ''))
-        for lang, X in (('en', self.S), ('zh', self.Z)):
-            for s in X[a]:
-                for t in X[b]:
-                    v = self.pair(lang, s, t)
-                    if v > best[0] + 1e-9:
-                        best = (round(min(v, 1.0), 3), ('same gloss' if s == t else 'Numberbatch') + (' (中)' if lang == 'zh' else ''), (s, t))
+        """dict(m: score 0–1, kind, ev: evidence text, ok: is a meaning link, e: best embedding)"""
+        pa = 1.0 if self.NS[a] <= 2 else math.sqrt(2 / self.NS[a])
+        pb = 1.0 if self.NS[b] <= 2 else math.sqrt(2 / self.NS[b])
+        best = dict(m=0.0, kind='', ev='', ok=False, e=0.0)
+        med = None
+        for ra, s in self.S[a]:
+            for rb, t in self.S[b]:
+                base, kind = self.en_pair(s, t)
+                f = (1.0 if ra == 0 else 0.85) * (1.0 if rb == 0 else 0.85) * pa * pb
+                emb = self.cache.get((s, t) if s < t else (t, s), (0, 0, 1.0 if s == t else 0))[2]
+                best['e'] = max(best['e'], emb)
+                ev = s if s == t else f'{s} ~ {t}'
+                if kind in ('same sense', 'WordNet synonym'):
+                    if base * f > best['m'] or not best['ok']:
+                        if not best['ok'] or base * f > best['m']: best.update(m=base * f, kind=kind, ev=ev, ok=True)
+                elif kind == 'WordNet broader/narrower' or (kind == 'embeddings' and base >= 0.7):
+                    if not med or base * f > med[0]: med = (base * f, kind, ev)
+        # Chinese
+        (wa, ca, na), (wb, cb, nb) = self.Z[a], self.Z[b]
+        fz = (1.0 if na <= 2 else math.sqrt(2 / na)) * (1.0 if nb <= 2 else math.sqrt(2 / nb))
+        shared = wa & wb
+        # one shared character is a weaker match (易 'easy' and 'change'): it needs some English support
+        if shared and all(len(w) == 1 for w in shared) and best['e'] < 0.3: shared = set()
+        zcos = max((self.cos('zh', x, y) for x in wa for y in wb), default=0.0)
+        if shared and 0.95 * fz > (best['m'] if best['ok'] else 0):
+            best.update(m=0.95 * fz, kind='same Chinese word', ev='中 ' + '、'.join(sorted(shared)[:3]), ok=True)
+        zagree = zcos >= 0.75 or bool(ca & cb)
+        # compounds
+        cp = self.compound(a, b)
+        if cp and cp[2] and 0.9 > (best['m'] if best['ok'] else 0):
+            best.update(m=0.9, kind=cp[0], ev=cp[1], ok=True)
+        if med and not best['ok']:
+            if zagree or cp:
+                why = 'Chinese agrees' if zagree else cp[0]
+                best.update(m=med[0], kind=f'{med[1]} + {why}', ev=med[2], ok=True)
+        if not best['ok']:
+            # weak: embeddings only, never a link; keep the best as a score
+            best['m'] = round(0.6 * max(best['e'], zcos), 3)
+            best['kind'] = 'embeddings only' if best['m'] else ''
+            if cp: best['kind'] = (best['kind'] + ' · ' if best['kind'] else '') + cp[0]; best['ev'] = cp[1]
+        elif cp and not cp[2] and cp[0] not in best['kind']:
+            best['kind'] += ' · ' + cp[0]
+        best['m'] = round(min(best['m'], 1.0), 3); best['e'] = round(best['e'], 3)
         return best
-
-    def has(self, c):
-        return bool(self.S[c] or self.Z[c])
