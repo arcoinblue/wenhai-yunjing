@@ -184,6 +184,8 @@ body.home { min-height: 100%; }
 .contents a:hover .t { color: var(--accent); }
 .contents .t { font: 600 var(--fs-l)/1.4 var(--serif); }
 .contents .t .zh { font-family: var(--cjk); font-weight: 400; color: var(--ink-2); margin-left: 6px; font-size: var(--fs); }
+.contents .t .prov { font: 400 var(--fs-xs)/1 var(--serif); color: var(--warn); border: 1px solid currentColor;
+  border-radius: var(--r); padding: 2px 5px; vertical-align: 3px; margin-left: 8px; }
 .contents .d { grid-column: 2; font-size: var(--fs-s); color: var(--ink-2); margin-top: 2px; }
 .home .colophon { margin-top: 18px; font-size: var(--fs-xs); color: var(--ink-3); }
 @media (max-width: 640px) {
