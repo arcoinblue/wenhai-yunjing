@@ -16,9 +16,8 @@
     } catch (e) { /* ignore */ }
   }
   const on = () => [...document.querySelectorAll('input[name=sys]:checked')].map(i => i.value);
-  const LANG = () => (store().lang === 'zh' ? 'zh' : 'en');
 
-  fetch('data/rhymes.json?v=1').then(r => r.json()).then(d => {
+  fetch('data/rhymes.json?v=3').then(r => r.json()).then(d => {
     D = d;
     const o = store();
     const want = Array.isArray(o.rsys) ? o.rsys : D.systems.filter(s => s.on).map(s => s.k);
@@ -140,10 +139,6 @@
     const grades = Object.entries(R.grades).map(([k, v]) => `${k} ${v}`).join(', ');
     const link = R.chart ? `tables.html#c=${R.chart}${R.row ? '&r=' + R.row : ''}` : 'tables.html';
     const rowDesc = R.row ? ` · ${ROWNAME[R.row[0]]}, ${['', '一', '二', '三'][+R.row.split('-')[1]]}等` : '';
-    const verbs = R.verbs.length ? R.verbs.map(v => `<div class="vb"><span class="tg">${esc(v.c)}</span><span class="st">${v.stem}</span>
-        <span class="r">${esc(v.ghc)}</span><span class="g">${esc((v[LANG()] || v.en).replace(/\[[ᴀʙ]\]/g, ''))}</span></div>`).join('') +
-        '<a class="golink" href="pairs.html">Verb stem pairs ›</a>'
-      : '<div class="muted2">No verb stems with this rhyme.</div>';
     $('#rbody').innerHTML = `
       <div class="rh">Rhyme ${cur}</div>
       <div class="rsub">${W ? `攝 ${esc(W.she.label)}${W.she.sub ? ` (${esc(W.she.sub)})` : ''} · ${W.block} (${W.cycle})${W.shade ? ' · second column' : ''}` : ''}<br>Wenhai ${names || '—'}</div>
@@ -151,8 +146,7 @@
       <h3>Beaudouin's analysis</h3><table class="rv">${ana}</table>
       <h3>In the rhyme tables</h3>
       <div class="muted2">${R.xiao} 小韻 in the Wenhai · ${R.n} characters in Miyake's database${grades ? ` (grades ${esc(grades)})` : ''}</div>
-      <a class="golink" href="${link}">Chart ${R.chart} ${esc(R.chartName)}${rowDesc} ›</a>
-      <h3>Verb stems</h3>${verbs}`;
+      <a class="golink" href="${link}">Chart ${R.chart} ${esc(R.chartName)}${rowDesc} ›</a>`;
     $('#rpanel').scrollTop = 0;
     const t = document.querySelector(`.rt td.rno.r${cur}`);
     if (t && fromhash) t.scrollIntoView({ block: 'center', inline: 'nearest' });

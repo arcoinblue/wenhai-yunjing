@@ -29,8 +29,7 @@ Dataset of the Backbone of Tangut Linguistics and Philology* (Zenodo). Character
   Nishida (1964), Sofronov (1968, two stages) and the Tibetan / Sanskrit transcriptions as options. GHC, GX and Miyake
   follow the site author's table; everything else is from Mathieu Beaudouin, *Grammaire du tangoute. Phonologie et
   morphologie* (thèse, INALCO, 2023), “Reconstruction des rimes du tangoute”. Click a rhyme number for every reading,
-  Beaudouin's analysis (initial, medial, phonation), the chart and row in the rhyme tables, and verb stems with that
-  rhyme. Links: `rhymes.html#r=<rhyme>`.
+  Beaudouin's analysis (initial, medial, phonation), and the chart and row in the rhyme tables. Links: `rhymes.html#r=<rhyme>`.
 
 - Tangut font switch: Noto Serif Tangut and BabelStone Tangut Wenhai (both bundled, SIL OFL), and Tangut Yinchuan,
   which is not redistributable and is used only if installed or loaded from the reader's own file (kept in their browser).
