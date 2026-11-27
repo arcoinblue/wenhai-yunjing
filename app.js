@@ -250,7 +250,7 @@ function readingOf(ch) {   // GHC first; Miyake only if GHC is missing
   return '';
 }
 function fanqieHTML(f) {
-  if (!f) return '<span style="color:#888">—</span>';
+  if (!f) return '<span class="none">—</span>';
   return chars(f.replace(/\s/g, '')).map(c => {
     const r = c === '𘈖' ? '反' : (c === '□' ? '' : readingOf(c));
     return `<span class="fqpart"><span class="tg">${esc(c)}</span><small>${esc(r)}</small></span>`;

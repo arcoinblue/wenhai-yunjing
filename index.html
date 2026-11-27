@@ -8,48 +8,28 @@
   // Links to the rhyme tables used to point at the site root (#c=…&s=…): send them on.
   if (/(^#|&)(c|s)=/.test(location.hash)) location.replace('tables.html' + location.hash);
 </script>
-<link rel="stylesheet" href="style.css?v=22">
+<link rel="stylesheet" href="site.css?v=30">
 <link rel="icon" href="data:,">
-<style>
-  body.home { display: flex; align-items: flex-start; justify-content: center; min-height: 100%; height: auto; }
-  .home-in { width: 100%; max-width: 640px; padding: 12vh 24px 60px; box-sizing: border-box; }
-  .home h1 { font: 400 46px/1.1 var(--cjk); color: #2f2a25; margin: 0; letter-spacing: .04em; }
-  .home h1 .en { display: block; font: 400 22px/1.3 "Charis SIL", "Gentium Plus", "Noto Serif", Georgia, serif;
-    color: var(--ink-soft); letter-spacing: 0; margin-top: 8px; }
-  .home .links { margin-top: 40px; display: grid; gap: 12px; }
-  .home .links a { display: block; padding: 16px 20px; background: var(--card); border: 1px solid var(--card-edge);
-    border-radius: 10px; color: var(--ink); text-decoration: none; transition: border-color .15s, background .15s; }
-  .home .links a:hover { background: #fff; border-color: var(--sel-edge); }
-  .home .links .t { font: 600 19px/1.35 "Charis SIL", "Gentium Plus", "Noto Serif", Georgia, var(--cjk); color: #2f2a25; }
-  .home .links .t::after { content: " ›"; color: var(--ink-soft); font-weight: 400; }
-  .home .links .d { margin-top: 4px; font: 14.5px/1.5 Georgia, var(--cjk); color: var(--ink-soft); }
-</style>
 </head>
 <body class="home">
 <main class="home-in">
-  <h1>文海<span class="en">The Tangut <i>Wenhai</i></span></h1>
-  <nav class="links">
-    <a href="tables.html">
-      <div class="t">Web韻圖 〜文海〜</div>
-      <div class="d">Yunjing-style rhyme tables of the Wenhai's 小韻, with GHC, MB and Miyake readings and the page scans.</div>
-    </a>
-    <a href="pairs.html">
-      <div class="t">Verb stem pairs</div>
-      <div class="d">Verbs with a stem A and a stem B, grouped by how the final alternates.</div>
-    </a>
-    <a href="rhymes.html">
-      <div class="t">Rhyme reconstructions</div>
-      <div class="d">The 105 rhymes by 攝, lax ~ tense ~ rhotic, with GHC, Beaudouin and other reconstructions side by side.</div>
-    </a>
-    <a href="practice.html">
-      <div class="t">Radical code practice</div>
-      <div class="d">See a Tangut character and type its radical code (Downes's recursive radical method), with reduced radicals as an option.</div>
-    </a>
-    <a href="write.html">
-      <div class="t">Write Tangut</div>
-      <div class="d">Build sentences by radical code, reading or meaning, with the reading and gloss under each word.</div>
-    </a>
-  </nav>
+  <div class="slip" aria-hidden="true">文海</div>
+  <div>
+    <h1>The Tangut <i>Wenhai</i></h1>
+    <p class="lede">The Tangut rhyme dictionary <span lang="zh">文海</span> laid out as rhyme tables, with its readings, rhymes and verb stems, and tools for reading and writing Tangut.</p>
+    <ol class="contents">
+      <li><a href="tables.html"><span class="t">Rhyme tables<span class="zh">Web韻圖</span></span>
+        <span class="d">Yunjing-style tables of the Wenhai's 小韻, with GHC, MB and Miyake readings and the page scans.</span></a></li>
+      <li><a href="rhymes.html"><span class="t">Rhyme reconstructions</span>
+        <span class="d">The 105 rhymes by 攝, lax ~ tense ~ rhotic, with GHC, Beaudouin and other reconstructions side by side.</span></a></li>
+      <li><a href="pairs.html"><span class="t">Verb stem pairs</span>
+        <span class="d">Verbs with a stem A and a stem B, grouped by how the final alternates.</span></a></li>
+      <li><a href="practice.html"><span class="t">Radical code practice</span>
+        <span class="d">See a character and type its radical code (Downes's recursive radical method).</span></a></li>
+      <li><a href="write.html"><span class="t">Write Tangut</span>
+        <span class="d">Build sentences by radical code, reading or meaning, with the reading and gloss under each word.</span></a></li>
+    </ol>
+  </div>
 </main>
 </body>
 </html>

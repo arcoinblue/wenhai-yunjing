@@ -146,7 +146,7 @@
       <h3>Beaudouin's analysis</h3><table class="rv">${ana}</table>
       <h3>In the rhyme tables</h3>
       <div class="muted2">${R.xiao} 小韻 in the Wenhai · ${R.n} characters in Miyake's database${grades ? ` (grades ${esc(grades)})` : ''}</div>
-      <a class="golink" href="${link}">Chart ${R.chart} ${esc(R.chartName)}${rowDesc} ›</a>`;
+      <a class="golink" href="${link}">Chart ${R.chart} ${esc(R.chartName)}${rowDesc}</a>`;
     $('#rpanel').scrollTop = 0;
     const t = document.querySelector(`.rt td.rno.r${cur}`);
     if (t && fromhash) t.scrollIntoView({ block: 'center', inline: 'nearest' });

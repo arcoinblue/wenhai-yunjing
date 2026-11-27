@@ -55,7 +55,7 @@
           <div class="meta">${ch.sy.length} radical${ch.sy.length > 1 ? 's' : ''}${parts > 1 ? ` in ${parts} parts` : ''}${ch.wh ? ` · Wenhai ${esc(ch.wh)}` : ''}</div>
         </div>
       </div>
-      <div style="margin-top:14px"><input id="code" class="codebox" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="type the code, e.g. maca-nali"></div>
+      <div class="pc-code"><input id="code" class="codebox" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="type the code, e.g. maca-nali"></div>
       <div class="preview" id="prev"><span class="ph">Radicals you type appear here.</span></div>
       <div class="pc-row">
         <button class="btn pri" id="bCheck">Check <span class="kbd">Enter</span></button>
@@ -175,7 +175,7 @@
     $('#result').innerHTML = `
       <div class="verdict ${head[0]}">${head[1]}</div>
       <div class="cmp">${yours}
-        <div>Code</div><div class="syls"><span class="mono" style="font-size:16px;color:#2f2a25">${esc(cur.code)}</span></div>
+        <div>Code</div><div class="syls"><span class="mono code-ans">${esc(cur.code)}</span></div>
         <div></div><div class="syls">${TG.codePics(cur.code)}</div>
       </div>
       <div class="pc-row"><button class="btn pri" id="bNext">Next <span class="kbd">Enter</span></button></div>`;

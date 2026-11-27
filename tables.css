@@ -1,0 +1,150 @@
+/* Rhyme tables (tables.html): chart, details panel, page viewer */
+:root { --cell: 42px; --row: 50px; }
+
+#app { --sidew: var(--side); --panelw: 400px; display: grid;
+  grid-template-columns: var(--sidew) minmax(0, 1fr) var(--panelw); transition: grid-template-columns .2s; }
+#app.side-folded { --sidew: 30px; }
+#app.panel-folded { --panelw: 30px; }
+#side, #panel { position: relative; }
+#main { overflow: auto; padding: 18px; }
+#panel { overflow-y: auto; background: var(--paper); border-left: 1px solid var(--hair); padding: 14px 18px 30px; }
+#panelBody { padding-left: 16px; }
+
+.fold { position: absolute; top: 8px; z-index: 5; width: 20px; height: 26px; padding: 0; border: 1px solid var(--hair);
+  border-radius: var(--r); background: var(--white); color: var(--ink-2); font-size: 14px; line-height: 1; cursor: pointer; }
+.fold:hover { color: var(--ink); border-color: var(--ink-3); }
+#foldSide { right: 6px; }
+#foldPanel { left: 6px; }
+#app.side-folded #side, #app.panel-folded #panel { padding: 0; overflow: hidden; }
+#app.side-folded .side-in, #app.panel-folded #panelBody { display: none; }
+.controls h1 { padding-right: 24px; }
+
+#results { list-style: none; margin: 6px 0 0; padding: 0; max-height: 280px; overflow-y: auto; }
+#results li { padding: 4px 2px; border-bottom: 1px solid var(--hair-2); cursor: pointer; font-size: var(--fs-s); }
+#results li:hover { background: var(--fill); }
+#results .tg { font-size: 20px; margin-right: 6px; vertical-align: middle; }
+#results .meta { color: var(--ink-2); font-size: var(--fs-xs); }
+
+.legend .rn { width: 22px; height: 22px; font-size: 14px; vertical-align: middle; margin-right: 6px; cursor: default; }
+.mark-demo { display: inline-block; position: relative; width: 20px; height: 20px; margin: 0 7px 0 1px;
+  vertical-align: middle; background: var(--white); border: 1px solid var(--hair); }
+.mark-demo::after { content: ""; position: absolute; top: 0; right: 0;
+  border-top: 7px solid var(--accent); border-left: 7px solid transparent; }
+
+/* ------------------------------------------------------------- chart ---- */
+/* the frame follows a block-printed page: heavy outer rule, thin inner rule */
+#chartWrap { display: inline-block; width: max-content; background: var(--white); border: 2px solid var(--line); padding: 3px; }
+#chart { border-collapse: collapse; color: var(--ink); outline: 1px solid var(--line); }
+#chart td, #chart th { padding: 0; text-align: center; vertical-align: middle; }
+#chart th { font-weight: normal; }
+.navbtn { width: 30px; height: 24px; border: 1px solid var(--hair); border-radius: var(--r); background: var(--white);
+  color: var(--ink-2); font-size: 13px; cursor: pointer; }
+.navbtn:hover { color: var(--ink); border-color: var(--ink-3); }
+.corner { font: 17px/1.25 var(--cjk); }
+.corner .cfin { font: 12px var(--serif); color: var(--ink-2); white-space: nowrap; }
+.grp { height: 48px; font-family: var(--tg-fixed); font-size: 21px; padding: 0 6px !important; cursor: help; }
+.grp .spread { display: flex; justify-content: space-between; }
+.grp.single { font-size: 13px; line-height: 1; }
+.grp.single .v { writing-mode: vertical-rl; display: inline-block; white-space: nowrap; }
+.qz { height: 56px; font: 15px var(--cjk); color: var(--ink-2); }
+.qz span { writing-mode: vertical-rl; display: inline-block; line-height: 1; letter-spacing: -1px; }
+.sep { border-left: 1px solid var(--line); }
+thead tr:last-child th { border-bottom: 1px solid var(--line); }
+tr.secend td { border-bottom: 1px solid var(--line); }
+.deng { width: 24px; min-width: 24px; font: 13px var(--cjk); color: var(--ink-2); }
+.deng.sm { font-size: 11px; white-space: nowrap; padding: 0 2px !important; min-width: 30px; }
+.rowname { width: 52px; min-width: 52px; line-height: 1; }
+.rowname .rf { display: block; font-size: 10px; color: var(--ink-2); margin-top: 2px; }
+.seclab { width: 34px; min-width: 34px; font: 19px var(--cjk); }
+.title { width: 40px; min-width: 40px; font: 20px var(--cjk); vertical-align: top !important;
+  padding-top: 24px !important; border-left: 1px solid var(--line); }
+.vt { writing-mode: vertical-rl; display: inline-block; letter-spacing: 4px; white-space: nowrap; }
+.title .vt { letter-spacing: 3px; }
+
+td.c { width: var(--cell); min-width: var(--cell); height: var(--row); position: relative; cursor: default; }
+td.c.has { cursor: pointer; }
+td.c.has:hover:not(.sel) { background: var(--fill); }
+td.c.sel { background: var(--wash); box-shadow: inset 0 0 0 1.5px var(--accent); }
+td.c .ch { font-family: var(--tg); font-size: 24px; line-height: 1.05; display: block; }
+td.c .fq { font-family: var(--tg); font-size: 11px; display: block; line-height: 1.1; color: var(--ink-2); }
+td.c .rd { font-size: 9.5px; display: block; line-height: 1.15; color: var(--ink-2); }
+td.c .o { display: inline-block; width: 18px; height: 18px; border: 1px solid var(--empty); border-radius: 50%; }
+td.c .mark { position: absolute; top: 0; right: 0; width: 0; height: 0;
+  border-top: 7px solid var(--accent); border-left: 7px solid transparent; }
+td.c.nwc .ch { color: var(--ink-3); }
+
+/* row names: the Wenhai's rhyme-name characters in roundels */
+.rn { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px;
+  border-radius: 50%; border: 1px solid var(--ink); font-family: var(--tg); font-size: 19px; background: var(--white);
+  color: var(--ink); cursor: pointer; }
+.rn.trad { background: var(--ink); color: var(--white); }
+.rn.nwr { border-style: dashed; color: var(--ink-3); border-color: var(--ink-3); }
+.rn.sel { box-shadow: 0 0 0 2px var(--white), 0 0 0 3.5px var(--accent); }
+
+/* ------------------------------------------------------------- panel ---- */
+.placeholder { color: var(--ink-2); font-size: var(--fs-s); line-height: 1.7; }
+.slot-h { font: 600 var(--fs-l)/1.3 var(--serif); margin: 0 0 3px; }
+.slot-sub { font-size: var(--fs-s); color: var(--ink-2); margin-bottom: 8px; line-height: 1.5; }
+.slot-sub .tg { font-size: 15px; color: var(--ink); }
+
+/* one 小韻 = one entry, ruled off like a dictionary entry */
+.card { border-top: 1px solid var(--line); margin: 14px 0 0; padding-bottom: 4px; }
+.card-h { display: flex; align-items: center; gap: 12px; padding: 10px 0 8px; }
+.card-h .big { font-family: var(--tg); font-size: 40px; line-height: 1; }
+.card-h .info { font-size: var(--fs-s); line-height: 1.5; }
+.card-h .hgl { color: var(--ink-2); }
+.card-h .tag { font-size: var(--fs-xs); color: var(--ink-2); margin-left: 4px; }
+.card-h .tag::before { content: "· "; }
+.card-h .tag.nwt { color: var(--accent); }
+.card dl.kv { padding: 4px 0 8px; }
+dl.kv .tg { font-size: 21px; vertical-align: middle; }
+.fqpart { display: inline-block; text-align: center; margin-right: 8px; }
+.fqpart .tg { display: block; font-size: 23px; }
+.fqpart small { display: block; font-size: 10.5px; color: var(--ink-2); }
+table.mem { width: 100%; border-collapse: collapse; font-size: 13px; }
+table.mem th { font-weight: 600; color: var(--ink-2); text-align: left; font-size: var(--fs-xs);
+  padding: 4px 6px; background: var(--fill); border-top: 1px solid var(--hair); border-bottom: 1px solid var(--hair); }
+table.mem td { padding: 3px 6px; border-bottom: 1px solid var(--hair-2); vertical-align: middle; }
+table.mem td.n { color: var(--ink-3); font-size: 11px; width: 18px; }
+table.mem td.tg { font-size: 23px; width: 34px; }
+table.mem tr.warn td { background: var(--warn-wash); }
+table.mem td.gl { line-height: 1.35; }
+table.mem td.lfw { font-size: 11.5px; white-space: nowrap; width: 64px; line-height: 1.3; }
+table.mem .rdiff { display: block; font-size: 10.5px; color: var(--warn); }
+.flag { font-size: var(--fs-xs); color: var(--warn); padding: 4px 0 8px; }
+.rhyme-big { font-size: 44px; width: 62px; height: 62px; cursor: default; }
+.card a.cmp { display: block; margin: 4px 0 10px; font-size: var(--fs-s); }
+
+/* ---------------------------------------------------- Wenhai page viewer ---- */
+a.wpos { color: inherit; text-decoration: underline dotted; text-underline-offset: 2px; cursor: zoom-in; }
+a.wpos:hover { color: var(--accent); text-decoration-style: solid; }
+#pageView { position: fixed; inset: 0; z-index: 50; background: rgba(29, 28, 26, .6); display: flex; padding: 2.5vh 2.5vw; }
+body.pv-open { overflow: hidden; }
+.pv-box { flex: 1; display: flex; flex-direction: column; background: var(--paper); border: 1px solid var(--line); overflow: hidden; min-width: 0; }
+.pv-bar { display: flex; align-items: center; gap: 8px; padding: 6px 10px; border-bottom: 1px solid var(--line); font-size: var(--fs-s); }
+#pvCap { flex: 1; text-align: center; min-width: 0; }
+.pv-where { color: var(--ink-2); }
+.pv-bar button { font-size: var(--fs-xs); padding: 3px 10px; border: 1px solid var(--hair); background: var(--white);
+  border-radius: var(--r); cursor: pointer; }
+.pv-bar button:hover:not(:disabled) { border-color: var(--ink-3); }
+.pv-bar button:disabled { opacity: .35; cursor: default; }
+.pv-bar button.on, .pv-bar button.on:hover { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.pv-fit { display: inline-flex; gap: 3px; }
+#pvStage { flex: 1; position: relative; overflow: hidden; cursor: grab; touch-action: none; background: var(--fill); }
+#pvStage.drag { cursor: grabbing; }
+#pvImg { position: absolute; left: 0; top: 0; transform-origin: 0 0; user-select: none; max-width: none; }
+#pvLoad { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  color: var(--ink-2); pointer-events: none; }
+.pv-hint { padding: 4px 10px; font-size: var(--fs-xs); color: var(--ink-2); text-align: center; border-top: 1px solid var(--hair); }
+
+@media (max-width: 1100px) {
+  #app, #app.side-folded, #app.panel-folded { grid-template-columns: 1fr; }
+  body.shell.tables-page { height: auto; overflow: visible; display: block; }
+  #app.side-folded #side, #app.panel-folded #panel { min-height: 40px; }
+  #side { border-right: 0; border-bottom: 1px solid var(--hair); }
+  #panel { border-left: 0; border-top: 1px solid var(--line); }
+  #main { order: 2; }
+  #panel { order: 3; }
+}
+@media (max-width: 700px) { #pageView { padding: 0; } .pv-hint { display: none; } }
+td .none, .none { color: var(--empty); }

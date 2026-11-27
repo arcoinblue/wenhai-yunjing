@@ -4,17 +4,31 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Write Tangut · 文海 / The Tangut Wenhai</title>
-<link rel="stylesheet" href="style.css?v=22">
-<link rel="stylesheet" href="pairs.css?v=1">
-<link rel="stylesheet" href="tg.css?v=1">
+<link rel="stylesheet" href="site.css?v=30">
+<link rel="stylesheet" href="tg.css?v=30">
 <link rel="icon" href="data:,">
 </head>
-<body class="pairs-page tg-page">
-<div id="pairsApp" class="tgApp">
-  <aside id="pside">
-    <a class="back" href="./">‹ The Tangut Wenhai</a>
+<body class="shell tg-page">
+<header class="site">
+  <a class="brand" href="./"><span class="zh">文海</span><span class="en">The Tangut Wenhai</span></a>
+  <nav>
+    <a href="tables.html">Rhyme tables</a>
+    <a href="rhymes.html">Rhymes</a>
+    <a href="pairs.html">Stem pairs</a>
+    <a href="practice.html">Radical codes</a>
+    <a href="write.html" aria-current="page">Write</a>
+  </nav>
+  <details class="display"><summary>Display</summary><div class="menu">
+    <fieldset class="opts fontsel"><legend>Tangut font</legend><div id="fontBox"></div></fieldset>
+    <fieldset class="opts row"><legend>Meanings</legend>
+      <label><input type="radio" name="lang" value="en" checked> English</label>
+      <label><input type="radio" name="lang" value="zh"> 中文</label>
+    </fieldset>
+  </div></details>
+</header>
+<div id="pairsApp" class="page split tgApp">
+  <aside id="pside" class="controls">
     <h1>Write Tangut</h1>
-    <p class="tagline">Build Tangut sentences by radical code, reading or meaning, with the reading and gloss under each word</p>
 
     <fieldset class="opts">
       <legend>Draft</legend>
@@ -30,11 +44,6 @@
       <label class="blk"><input type="radio" name="sys" value="miy"> Miyake</label>
       <label class="blk"><input type="radio" name="sys" value="mb"> MB <span class="side-note">Wenhai characters only</span></label>
     </fieldset>
-    <fieldset class="opts lang">
-      <legend>Meanings</legend>
-      <label><input type="radio" name="lang" value="en" checked> English</label>
-      <label><input type="radio" name="lang" value="zh"> 中文</label>
-    </fieldset>
     <fieldset class="opts">
       <legend>Radical search</legend>
       <label class="blk"><input type="checkbox" id="optReduced"> reduced radicals</label>
@@ -42,10 +51,6 @@
       <label class="blk"><input type="checkbox" id="optPicker" checked> show the radical table</label>
     </fieldset>
 
-    <fieldset class="opts fontsel">
-      <legend>Tangut font</legend>
-      <div id="fontBox"></div>
-    </fieldset>
 
     <details class="about">
       <summary>How to use</summary>
@@ -60,7 +65,7 @@
     <div class="lines">
       <div class="ln"><span class="lab">Tangut</span><span class="val tgv" id="lT"></span><button type="button" class="btn sm" data-copy="T">Copy</button></div>
       <div class="ln"><span class="lab" id="lRlab">GHC</span><span class="val" id="lR"></span><button type="button" class="btn sm" data-copy="R">Copy</button></div>
-      <div class="ln"><span class="lab">Gloss</span><span class="val" id="lG" style="font-family:Georgia,var(--cjk);font-size:14px"></span><button type="button" class="btn sm" data-copy="G">Copy</button></div>
+      <div class="ln"><span class="lab">Gloss</span><span class="val gloss" id="lG"></span><button type="button" class="btn sm" data-copy="G">Copy</button></div>
       <div class="ln"><span class="lab"></span><span class="val side-note" id="copied"></span><button type="button" class="btn sm" data-copy="all">Copy all</button></div>
     </div>
     <div class="inbar">
@@ -75,8 +80,8 @@
     </div>
   </main>
 </div>
-<script src="tg-common.js?v=1"></script>
-<script src="write.js?v=1"></script>
-<script type="module" src="fonts.js?v=17"></script>
+<script src="tg-common.js?v=30"></script>
+<script src="write.js?v=30"></script>
+<script type="module" src="fonts.js?v=30"></script>
 </body>
 </html>
