@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Write Tangut · 文海 / The Tangut Wenhai</title>
+<link rel="stylesheet" href="style.css?v=22">
+<link rel="stylesheet" href="pairs.css?v=1">
+<link rel="stylesheet" href="tg.css?v=1">
+<link rel="icon" href="data:,">
+</head>
+<body class="pairs-page tg-page">
+<div id="pairsApp" class="tgApp">
+  <aside id="pside">
+    <a class="back" href="./">‹ The Tangut Wenhai</a>
+    <h1>Write Tangut</h1>
+    <p class="tagline">Build Tangut sentences by radical code, reading or meaning, with the reading and gloss under each word</p>
+
+    <fieldset class="opts">
+      <legend>Draft</legend>
+      <div class="drafts"><select id="draftSel" aria-label="Draft"></select>
+        <button type="button" class="btn sm" id="dNew">New</button></div>
+      <div class="drafts"><button type="button" class="btn sm" id="dRen">Rename</button><button type="button" class="btn sm" id="dDel">Delete</button></div>
+    </fieldset>
+
+    <fieldset class="opts">
+      <legend>Readings</legend>
+      <label class="blk"><input type="radio" name="sys" value="ghc" checked> GHC <span class="side-note">Gong Hwang-cherng</span></label>
+      <label class="blk"><input type="radio" name="sys" value="gx"> GX <span class="side-note">Gong Xun</span></label>
+      <label class="blk"><input type="radio" name="sys" value="miy"> Miyake</label>
+      <label class="blk"><input type="radio" name="sys" value="mb"> MB <span class="side-note">Wenhai characters only</span></label>
+    </fieldset>
+    <fieldset class="opts lang">
+      <legend>Meanings</legend>
+      <label><input type="radio" name="lang" value="en" checked> English</label>
+      <label><input type="radio" name="lang" value="zh"> 中文</label>
+    </fieldset>
+    <fieldset class="opts">
+      <legend>Radical search</legend>
+      <label class="blk"><input type="checkbox" id="optReduced"> reduced radicals</label>
+      <div class="side-note">From two radicals on, each radical also stands for the others in its group (the dictionary site's groups).</div>
+      <label class="blk"><input type="checkbox" id="optPicker" checked> show the radical table</label>
+    </fieldset>
+
+    <fieldset class="opts fontsel">
+      <legend>Tangut font</legend>
+      <div id="fontBox"></div>
+    </fieldset>
+
+    <details class="about">
+      <summary>How to use</summary>
+      <p><b>Radicals</b>: type a code (hyphens optional) or click radicals in the table; characters whose code, or one of its parts, starts that way are listed. <b>Reading</b>: GHC in plain letters, with or without tone (<i>dzjwo2</i>, <i>dzjwo</i>; ɨ/ə as i, e or y; several syllables for a word). <b>Meaning</b>: English or Chinese. <b>Tangut</b>: paste text; it is split into dictionary words.</p>
+      <p><span class="kbd">Enter</span> adds the highlighted result at the cursor · <span class="kbd">↑</span><span class="kbd">↓</span> choose · with the box empty, <span class="kbd">←</span><span class="kbd">→</span> move the cursor and <span class="kbd">⌫</span> deletes · <span class="kbd">Alt</span>+<span class="kbd">1</span>–<span class="kbd">4</span> switch search. In the sentence: click to place the cursor, drag to reorder, <span class="kbd">Shift</span>+<span class="kbd">←</span><span class="kbd">→</span> moves a word, ① ② switches between a character's readings, double-click a gloss to write your own.</p>
+      <p>Characters, words, readings (GHC, GX, Miyake), meanings and radical codes are from the Tangut Character Dictionary v2.2 (codes: Alan Downes, <i>Xixia Dictionaries</i>, 2008); MB readings from Mathieu Beaudouin's <i>Digital Wenhai</i>. Drafts are kept in this browser only.</p>
+    </details>
+  </aside>
+
+  <main id="pmain">
+    <div class="board" id="board" tabindex="0" aria-label="Sentence"><span class="empty">Loading…</span></div>
+    <div class="lines">
+      <div class="ln"><span class="lab">Tangut</span><span class="val tgv" id="lT"></span><button type="button" class="btn sm" data-copy="T">Copy</button></div>
+      <div class="ln"><span class="lab" id="lRlab">GHC</span><span class="val" id="lR"></span><button type="button" class="btn sm" data-copy="R">Copy</button></div>
+      <div class="ln"><span class="lab">Gloss</span><span class="val" id="lG" style="font-family:Georgia,var(--cjk);font-size:14px"></span><button type="button" class="btn sm" data-copy="G">Copy</button></div>
+      <div class="ln"><span class="lab"></span><span class="val side-note" id="copied"></span><button type="button" class="btn sm" data-copy="all">Copy all</button></div>
+    </div>
+    <div class="inbar">
+      <div class="modes" id="modes">
+        <button type="button" data-m="code" class="on">Radicals</button><button type="button" data-m="read">Reading</button><button type="button" data-m="mean">Meaning</button><button type="button" data-m="text">Tangut</button>
+        <span class="hint" id="count"></span>
+      </div>
+      <input id="q" class="codebox" autocomplete="off" autocapitalize="off" spellcheck="false">
+      <div class="preview" id="prev"></div>
+      <div class="results" id="res"></div>
+      <div class="picker" id="pk"></div>
+    </div>
+  </main>
+</div>
+<script src="tg-common.js?v=1"></script>
+<script src="write.js?v=1"></script>
+<script type="module" src="fonts.js?v=17"></script>
+</body>
+</html>

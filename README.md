@@ -31,6 +31,16 @@ Dataset of the Backbone of Tangut Linguistics and Philology* (Zenodo). Character
   morphologie* (thèse, INALCO, 2023), “Reconstruction des rimes du tangoute”. Click a rhyme number for every reading,
   Beaudouin's analysis (initial, medial, phonation), and the chart and row in the rhyme tables. Links: `rhymes.html#r=<rhyme>`.
 
+- **Radical code practice** (`practice.html`): a Tangut character is shown and you type its radical code
+  (Alan Downes's recursive radical method, top left to bottom right; hyphens optional), with a clickable radical
+  table, hints, a score and a list of missed characters to practise again. Options: all characters or Wenhai
+  characters only, code length, and accepting *reduced* radicals (a radical from the same group counts, for codes
+  of two or more radicals; groups as on the dictionary site).
+- **Write Tangut** (`write.html`): build sentences by radical code (with the radical table; reduced search
+  optional), GHC reading, English / Chinese meaning, or pasted Tangut text (split into dictionary words). Each word
+  shows its reading (GHC, GX, Miyake or MB) and gloss; the Tangut, reading and gloss lines can be copied. Named
+  drafts are kept in the browser.
+
 - Tangut font switch: Noto Serif Tangut and BabelStone Tangut Wenhai (both bundled, SIL OFL), and Tangut Yinchuan,
   which is not redistributable and is used only if installed or loaded from the reader's own file (kept in their browser).
 
@@ -44,7 +54,11 @@ Dataset of the Backbone of Tangut Linguistics and Philology* (Zenodo). Character
 - `data/wenhai.json`: generated data (charts, 小韻, members, rhymes)
 - `pairs.html`, `pairs.css`, `pairs.js`, `data/pairs.json`: the verb stem pairs page and its data
 - `rhymes.html`, `rhymes.css`, `rhymes.js`, `data/rhymes.json`: the rhyme reconstructions page and its data
+- `practice.html`, `practice.js`, `write.html`, `write.js`, `tg-common.js`, `tg.css`: the practice and writing pages
+- `data/tangut.json`: all 6,175 characters and 18,042 words of the Tangut Character Dictionary v2.2 (readings, meanings,
+  radical codes, Wenhai positions; MB readings from the Digital Wenhai), the 176 radicals and the reduced groups;
+  `img/rad/*.png`: the radical pictures from the same dictionary
 - `pages/`: Wenhai page images, one per folio side (2400 px, grayscale); sides with no surviving text have none
 - `fonts.js`: Tangut font switch
-- `fonts/NotoSerifTangut-subset.woff2`: Noto Serif Tangut, subset to the characters used (SIL Open Font License 1.1)
+- `fonts/NotoSerifTangut.woff2`: Noto Serif Tangut, all Tangut characters (SIL Open Font License 1.1)
 - `fonts/BabelStoneTangutWenhai.ttf`: BabelStone Tangut Wenhai v1.002 by Andrew West, unmodified (SIL Open Font License 1.1, see `fonts/BabelStoneTangutWenhai-OFL.txt`)

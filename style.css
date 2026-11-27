@@ -1,7 +1,7 @@
 @font-face {
   font-family: "TangutWeb";
   src: local("Noto Serif Tangut"), local("NotoSerifTangut-Regular"),
-       url("fonts/NotoSerifTangut-subset.woff2?v=3") format("woff2");
+       url("fonts/NotoSerifTangut.woff2?v=4") format("woff2");
   unicode-range: U+16FE0-16FFF, U+17000-187FF, U+18800-18AFF, U+18D00-18D8F;
   font-display: swap;
 }
