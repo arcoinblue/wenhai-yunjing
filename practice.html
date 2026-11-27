@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Radical code practice · 文海 / The Tangut Wenhai</title>
+<link rel="stylesheet" href="style.css?v=22">
+<link rel="stylesheet" href="pairs.css?v=1">
+<link rel="stylesheet" href="tg.css?v=1">
+<link rel="icon" href="data:,">
+</head>
+<body class="pairs-page tg-page">
+<div id="pairsApp" class="tgApp">
+  <aside id="pside">
+    <a class="back" href="./">‹ The Tangut Wenhai</a>
+    <h1>Radical code practice</h1>
+    <p class="tagline">See a character, type its radical code: Downes's recursive radical method, top left to bottom right</p>
+
+    <div class="stats"><div><b id="stOk">0</b><span>right</span></div><div><b id="stTry">0</b><span>tried</span></div><div><b id="stStreak">0</b><span>streak</span></div></div>
+    <div class="side-note" id="stBest"></div>
+
+    <fieldset class="opts">
+      <legend>Characters</legend>
+      <label class="blk"><input type="radio" name="pool" value="all" checked> all with a code (6,000)</label>
+      <label class="blk"><input type="radio" name="pool" value="wh"> in the Wenhai only</label>
+      <label class="blk"><input type="radio" name="pool" value="missed"> ones I missed</label>
+    </fieldset>
+    <fieldset class="opts">
+      <legend>Code length</legend>
+      <label class="blk"><input type="radio" name="len" value="any" checked> any</label>
+      <label class="blk"><input type="radio" name="len" value="s"> short (1–4 radicals)</label>
+      <label class="blk"><input type="radio" name="len" value="m"> medium (5–6)</label>
+      <label class="blk"><input type="radio" name="len" value="l"> long (7 or more)</label>
+    </fieldset>
+    <fieldset class="opts">
+      <legend>Checking</legend>
+      <label class="blk"><input type="checkbox" id="optReduced"> accept reduced radicals</label>
+      <div class="side-note">With this on, a radical from the same group as the right one counts (codes of two or more radicals), as in the dictionary site's reduced search. Hyphens are optional either way.</div>
+      <label class="blk"><input type="checkbox" id="optInfo" checked> show reading and meaning</label>
+      <label class="blk"><input type="checkbox" id="optPicker" checked> show the radical table</label>
+    </fieldset>
+
+    <fieldset class="opts">
+      <legend>Missed <button type="button" class="btn sm" id="clearMissed" style="float:right">clear</button></legend>
+      <div class="missed" id="missed"></div>
+    </fieldset>
+
+    <fieldset class="opts fontsel">
+      <legend>Tangut font</legend>
+      <div id="fontBox"></div>
+    </fieldset>
+
+    <details class="about">
+      <summary>About</summary>
+      <p>Each character's code lists its radicals from top left to bottom right; hyphens separate the structural parts. Codes, the 176 radicals and their pictures are from Alan Downes, <i>Xixia Dictionaries</i> (supplement to <i>The Xixia Writing System</i>, 2008), as included in the Tangut Character Dictionary v2.2; readings and meanings are from the same dictionary.</p>
+      <p>Keys: <span class="kbd">Enter</span> check, then next · <span class="kbd">Tab</span> one more radical as a hint · <span class="kbd">Esc</span> show the answer.</p>
+      <p>Your score and missed characters are kept in this browser only.</p>
+    </details>
+  </aside>
+
+  <main id="pmain">
+    <div class="pcard" id="card"><p class="muted">Loading…</p></div>
+  </main>
+</div>
+<script src="tg-common.js?v=1"></script>
+<script src="practice.js?v=1"></script>
+<script type="module" src="fonts.js?v=17"></script>
+</body>
+</html>
