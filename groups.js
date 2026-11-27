@@ -34,7 +34,7 @@
       linksOf[a].push(l); linksOf[b].push(l);
       return l;
     });
-    $('#altList').textContent = d.alt.join(', ');
+    $('#altList').textContent = d.alt.map(([a, s]) => a + (s.includes('Gong 1988') ? '' : ' (stem pairs only)')).join(', ');
     $('#thr').textContent = `character ≥ ${d.th.g.toFixed(2)}, meaning ≥ ${d.th.m.toFixed(2)}`;
   }
   const plain = s => (s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
@@ -195,6 +195,6 @@
   let t = null;
   $('#q').oninput = () => { clearTimeout(t); t = setTimeout(() => { shown = PAGE; render(); }, 200); };
   window.onhashchange = () => { if (/(^#|&)ch=/.test(location.hash)) { render(); $('#gmain').scrollTop = 0; } };
-  fetch('data/groups.json?v=2').then(r => r.json()).then(d => { prep(d); render(); })
+  fetch('data/groups.json?v=3').then(r => r.json()).then(d => { prep(d); render(); })
     .catch(e => { console.error(e); $('#gmain').innerHTML = '<p class="muted">Could not load data/groups.json.</p>'; });
 })();

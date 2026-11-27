@@ -1,5 +1,5 @@
 """Shared pieces for building data/groups.json: phonetic, graphic and meaning similarity."""
-import json, re, math, collections, unicodedata
+import json, re, math, collections, unicodedata, itertools
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -27,16 +27,16 @@ INIT = {
 }
 
 def init_rel(a, b):
-    """(weight, label) for two initials, or None."""
+    """(weight, label) for two initials, or None.  Only the two types in Gong (1988, §2):
+    A. voiced ~ voiceless aspirated (b ~ pʰ, l ~ lʰ, ɣ ~ x), B. unaspirated ~ aspirated voiceless (p ~ pʰ)."""
     if a == b: return 1.0, ''
     A, B = INIT.get(a), INIT.get(b)
     if not A or not B or A[1] != B[1]: return None
     ma = {A[2], B[2]}
+    if ma == {'vd', 'asp'}: return 0.75, 'voiced ~ aspirated'
+    if ma == {'son', 'vl'}: return 0.75, 'voiced ~ voiceless'          # l ~ lʰ
+    if ma == {'fric', 'vd'}: return 0.75, 'voiced ~ voiceless'         # x ~ ɣ
     if ma == {'vl', 'asp'}: return 0.75, 'aspiration'
-    if ma == {'vl', 'vd'}: return 0.7, 'voicing'
-    if ma == {'asp', 'vd'}: return 0.6, 'aspiration + voicing'
-    if ma == {'son', 'vl'}: return 0.7, 'voicing'          # l ~ lh
-    if ma == {'fric', 'vd'}: return 0.7, 'voicing'         # h ~ gh
     return None
 
 # ---- finals: 攝, cycle (lax / tense / rhotic), row ----------------------------------------
@@ -80,22 +80,30 @@ def characters(T, W, R):
     return C
 
 # ---- phonetic relation (Gong Hwang-cherng's alternations) ----------------------------------------
-# Cross-攝 vowel alternations: the ones attested in the verb stem pairs (pairs.json), plus
-# oral ~ nasalised vowel (攝 II ~ III, IV ~ V).
-def she_alternations(P, C):
-    alt = collections.Counter()
+# Cross-攝 vowel alternations: those in Gong (1988, tools/gong1988.json) and in the verb stem pairs
+# (data/pairs.json), plus oral ~ nasal (攝 II ~ III, IV ~ V).  ABL: 攝 pair -> sources; ATT: the exact rhyme
+# pairs attested in either, which weigh more than the same change between other rhymes of the two 攝.
+def she_alternations(P, C, R):
+    pos = rhyme_places(R)
+    she = {r: pl[0][0] for r, pl in pos.items()}
+    ABL, ATT = collections.defaultdict(set), set()
+    def add(ra, rb, src):
+        if ra == rb or ra not in she or rb not in she: return
+        if she[ra] != she[rb]:
+            ABL[tuple(sorted((she[ra], she[rb])))].add(src)
+            ATT.add(frozenset((ra, rb)))
+    G = json.loads((ROOT / 'tools/gong1988.json').read_text())
+    for e in G['examples']:
+        for ra, rb in itertools.combinations(sorted(set(e['r'])), 2): add(ra, rb, 'Gong 1988')
     for g in P['patterns']:
         for p in g['pairs']:
             a, b = C.get(p['a']), C.get(p['b'])
-            if a and b and a['she'] != b['she']:
-                alt[tuple(sorted((a['she'], b['she'])))] += 1
-    return alt
+            if a and b: add(a['rh'], b['rh'], 'stem pairs')
+    return ABL, ATT
 
 NASAL = {(1, 2), (3, 4)}
-# Further cross-攝 alternations (e.g. from Gong 1988), as pairs of 攝 indices (0 = 攝 I -u … 11 = 攝 XII):
-EXTRA_ALT = set()
 
-def final_rel(a, b, ABL):
+def final_rel(a, b, ALT):
     """(weight, [labels]) for the finals of two characters, or None."""
     labs, wgt = [], 1.0
     if a['she'] == b['she']:
@@ -110,21 +118,26 @@ def final_rel(a, b, ABL):
             if a['deng'] != b['deng'] or (a['cyc'] == b['cyc'] and a['long'] == b['long']):
                 labs.append('grade'); wgt *= 0.85
     else:
+        ABL, ATT = ALT
         k = tuple(sorted((a['she'], b['she'])))
-        if k in ABL or k in EXTRA_ALT:
-            labs.append(f"-{SHE_VOWEL[k[0]]} ~ -{SHE_VOWEL[k[1]]}"); wgt *= 0.7
+        if k in ABL:
+            if frozenset((a['rh'], b['rh'])) in ATT:
+                lo, hi = sorted((a['rh'], b['rh']))
+                labs.append(f"-{SHE_VOWEL[k[0]]} ~ -{SHE_VOWEL[k[1]]} (R.{lo} ~ R.{hi})"); wgt *= 0.8
+            else:
+                labs.append(f"-{SHE_VOWEL[k[0]]} ~ -{SHE_VOWEL[k[1]]}"); wgt *= 0.65
         elif k in NASAL:
-            labs.append('oral ~ nasal'); wgt *= 0.6
+            labs.append('oral ~ nasal'); wgt *= 0.55
         else:
             return None
         if a['cyc'] != b['cyc']:
             labs.append('cycle'); wgt *= 0.8
     return wgt, labs
 
-def phon_rel(a, b, ABL):
+def phon_rel(a, b, ALT):
     ir = init_rel(a['col'], b['col'])
     if not ir: return None
-    fr = final_rel(a, b, ABL)
+    fr = final_rel(a, b, ALT)
     if not fr: return None
     w = ir[0] * fr[0]
     labs = ([ir[1]] if ir[1] else []) + fr[1]

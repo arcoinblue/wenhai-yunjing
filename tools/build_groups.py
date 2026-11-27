@@ -6,11 +6,11 @@ Inputs: data/tangut.json, data/wenhai.json, data/rhymes.json, data/pairs.json, a
 (the en and zh rows, saved as nb_en.npy / nb_en.txt and nb_zh.npy / nb_zh.txt; extract them from
 conceptnet-numberbatch-17-06-300.gz, released through gensim-data on GitHub).
 
-1. Phonetic (a gate: a pair is only considered when it holds): the initials are the same, or differ only in
-   aspiration or voicing within one series (Gong 1988, 1999); the finals are the same rhyme, or alternate within
-   one 攝 (grade / medial, short ~ long, or across the three cycles lax ~ tense ~ rhotic), or alternate between
-   攝 as in the verb stem pairs (-i ~ -o, -u ~ -o, -ij ~ -i, -ij ~ -o, -a ~ -ɨ, -i ~ -ɨ, -ow ~ -ɨj) or oral ~
-   nasal; tone and -w- may differ. Each change lowers the weight.
+1. Phonetic (a gate: a pair is only considered when it holds): the initials are the same, or alternate as in
+   Gong (1988, §2): voiced ~ voiceless aspirated, or unaspirated ~ aspirated voiceless; the finals are the same
+   rhyme, or alternate within one 攝 (grade / medial, short ~ long, or across the three cycles lax ~ tense ~
+   rhotic), or alternate between two 攝 as in Gong (1988, tools/gong1988.json) or the verb stem pairs (the exact
+   rhyme pair attested weighs more), or oral ~ nasal; tone and -w- may differ. Each change lowers the weight.
 2. Graphic: Downes's radical codes; shared runs of two or more radicals inside a block (hyphen-separated part),
    single radicals counting 0.3, each weighted by rarity (idf), as a share of the smaller character.
 3. Meaning: best cosine between any English sense or any Chinese sense of the two glosses (Numberbatch); the same
@@ -39,13 +39,14 @@ def main():
     nb = Path(sys.argv[1]) if len(sys.argv) > 1 else NB_DIR
     T, W, R, P = load()
     C = characters(T, W, R)
-    ABL = she_alternations(P, C)
+    ALT = she_alternations(P, C, R)
+    ABL = ALT[0]
     by = collections.defaultdict(list)
     for c, x in C.items(): by[INIT[x['col']][1]].append(c)
     cand = {}
     for L in by.values():
         for a, b in itertools.combinations(L, 2):
-            r = phon_rel(C[a], C[b], ABL)
+            r = phon_rel(C[a], C[b], ALT)
             if r: cand[frozenset((a, b))] = (a, b, r)
     G, M = Graphic(C), Meaning(C, nb)
     links = []
@@ -100,7 +101,7 @@ def main():
     data = dict(
         note='Built by tools/build_groups.py. Phonetic relation after Gong Hwang-cherng; graphic from Downes radical codes; meaning from ConceptNet Numberbatch 17.06.',
         th=dict(g=TG, m=TM),
-        alt=[f"-{SHE_VOWEL[a]} ~ -{SHE_VOWEL[b]}" for a, b in sorted(ABL)],
+        alt=[[f"-{SHE_VOWEL[a]} ~ -{SHE_VOWEL[b]}", sorted(ABL[(a, b)])] for a, b in sorted(ABL)],
         she=[s['label'] for s in R['she']],
         chars=[[c, C[c]['ghc'], C[c]['mb'], C[c]['miy'], C[c]['en'], C[c]['zh'], C[c]['pos'], C[c]['lfw'], C[c]['code'], C[c]['she'], C[c]['rh'], cell(W, C[c])] for c in chars],
         links=[[ix[l['a']], ix[l['b']], l['p'], ' · '.join(l['pl']), l['g'], '|'.join(l['gp']), l['m'], l['how'], l['sa'], l['sb']] for l in links],
