@@ -29,14 +29,21 @@
       ({ i, c, ghc, mb, miy, en, zh, pos, lfw, code, she, rh, cell, plain: plain(ghc) }));
     CH.forEach(x => byChar.set(x.c, x));
     linksOf = CH.map(() => []);
-    D.L = d.links.map(([a, b, p, pl, g, gp, m, how, sa, sb], i) => {
-      const l = { i, a, b, p, pl, g, gp: gp ? gp.split('|') : [], m, how, sa, sb };
+    D.L = d.links.map(([a, b, p, pl, g, gp, m, mk, mev, ok], i) => {
+      const l = { i, a, b, p, pl, g, gp: gp ? gp.split('|') : [], m, mk, mev, ok: !!ok };
       linksOf[a].push(l); linksOf[b].push(l);
       return l;
     });
     $('#altList').textContent = d.alt.map(([a, s]) => a + (s.includes('Gong 1988') ? '' : ' (stem pairs only)')).join(', ');
-    $('#thr').textContent = `character ≥ ${d.th.g.toFixed(2)}, meaning ≥ ${d.th.m.toFixed(2)}`;
+    $('#thr').textContent = `${d.th.g.toFixed(2)}`;
+    // alternation categories in order: the fixed ones, with every change between 攝 where 'X' stands
+    CATS = [];
+    for (const [k, sec, lab] of d.cats) {
+      if (k === 'X') d.alt.forEach(([a]) => CATS.push({ k: a, sec, lab: a }));
+      else CATS.push({ k, sec, lab });
+    }
   }
+  let CATS = [];
   const plain = s => (s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
     .replace(/ŋ/g, 'ng').replace(/ɣ/g, 'gh').replace(/[ꞏˑ]/g, '').replace(/ʰ/g, 'h').replace(/¹/g, '1').replace(/²/g, '2')
     .replace(/ɨ/g, 'i').replace(/ə/g, 'e').replace(/[^a-z0-9]/g, '');
@@ -81,12 +88,14 @@
 
   const bar = (v, on) => `<span class="bar${on ? ' on' : ''}" title="${v.toFixed(2)}"><i style="width:${Math.round(v * 100)}%"></i></span><span class="sc">${v.toFixed(2)}</span>`;
   function linkCells(l, other) {
-    const thG = D.th.g, thM = D.th.m;
+    const thG = D.th.g;
     const sound = `<td class="lk snd">${bar(l.p, true)}<span class="lab">${esc(l.pl)}</span></td>`;
     const chr = `<td class="lk chr">${bar(l.g, l.g >= thG)}${l.gp.length ? `<span class="lab mono">${l.gp.map(esc).join(', ')}</span>` : ''}</td>`;
-    const mng = `<td class="lk mng">${bar(l.m, l.m >= thM)}${l.m ? `<span class="lab">${l.sa === l.sb ? esc(l.sa) : `${esc(l.sa)} ~ ${esc(l.sb)}`}${l.how && l.how.includes('中') ? ' <span class="nm">(中)</span>' : ''}</span>` : ''}</td>`;
+    const ev = l.mev ? `<span class="lab ev${/[\u{16FE0}-\u{18AFF}]/u.test(l.mev) ? ' tgev' : ''}">${tgText(l.mev)}</span>` : '';
+    const mng = `<td class="lk mng">${bar(l.m, l.ok)}${l.mk ? `<span class="lab kind${l.ok ? '' : ' weak'}">${esc(l.mk)}</span>` : ''}${ev}</td>`;
     return sound + chr + mng;
   }
+  const tgText = s => esc(s).replace(/([\u{16FE0}-\u{18AFF}\u{18D00}-\u{18D8F}]+)/gu, '<span class="tg">$1</span>');
   const linkHead = first => `<thead><tr>${first}<th>Sound</th><th>Character</th><th>Meaning</th></tr></thead>`;
 
   // ---- groups -------------------------------------------------------------------------------------------
@@ -113,7 +122,8 @@
     const members = g.m.map(i => CH[i]);
     return `<section class="psec grp" id="g${n}">
       <h2>${members.map(x => `<span class="tg">${esc(x.c)}</span>`).join('')}
-        <span class="n">group ${n} · ${members.length} characters · score ${g.s.toFixed(2)}</span></h2>
+        <span class="n">group ${n} · ${members.length} characters · weakest link ${g.w.toFixed(2)} · average ${g.s.toFixed(2)}</span>
+        ${g.att ? '<span class="gong" title="Contains a pair of rhymes attested in Gong (1988) or the verb stem pairs">attested rhymes</span>' : ''}</h2>
       <div class="alts">${alts.map(a => `<span class="alt">${esc(a)}</span>`).join('')}</div>
       <table class="pt mem">${memberHead()}<tbody>${members.map(x => memberRow(x, pieces)).join('')}</tbody></table>
       <details class="links"><summary>${L.length} link${L.length > 1 ? 's' : ''}</summary>
@@ -128,8 +138,15 @@
     const mode = D.modes[val('mode')], q = $('#q').value.trim();
     let G = mode.groups.map((g, k) => ({ ...g, n: k + 1 })).filter(g => matches(g, q));
     const sort = val('sort');
-    if (sort === 'score') G.sort((a, b) => b.s - a.s);
-    if (sort === 'she') { G.forEach(g => { g.she = majorityShe(g); }); G.sort((a, b) => a.she - b.she || b.m.length - a.m.length || b.s - a.s); }
+    const strength = (a, b) => b.w - a.w || b.m.length - a.m.length;
+    if (sort === 'alt') {
+      const ord = new Map(CATS.map((c, i) => [c.k, i]));
+      G.forEach(g => { g.sec = ord.has(g.cat) ? ord.get(g.cat) : CATS.length; });
+      G.sort((a, b) => a.sec - b.sec || (b.att - a.att) || strength(a, b));
+    }
+    if (sort === 'strength') G.sort(strength);
+    if (sort === 'size') G.sort((a, b) => b.m.length - a.m.length || b.w - a.w);
+    if (sort === 'she') { G.forEach(g => { g.sec = majorityShe(g); }); G.sort((a, b) => a.sec - b.sec || strength(a, b)); }
     return { mode, G, sort };
   }
 
@@ -140,14 +157,26 @@
     html += `<p class="muted gsum">${G.length} group${G.length === 1 ? '' : 's'} · ${total} characters · ${esc(mode.label)}</p>`;
     let toc = `<div class="toc-h">Groups <span class="n">${G.length}</span></div>`;
     const part = G.slice(0, shown);
-    if (sort === 'she') {
-      let last = -1;
-      const count = {}; G.forEach(g => { count[g.she] = (count[g.she] || 0) + 1; });
+    if (sort === 'alt' || sort === 'she') {
+      // sections: alternation categories (grouped under initials, medials, finals, tones), or 攝
+      const title = k => sort === 'she' ? `攝 ${esc(D.she[k])}` : esc((CATS[k] || { lab: 'other' }).lab);
+      const head = k => sort === 'she' ? '' : (CATS[k] || {}).sec || '';
+      const count = new Map(); G.forEach(g => count.set(g.sec, (count.get(g.sec) || 0) + 1));
+      let last = null, lastHead = null;
       for (const g of part) {
-        if (g.she !== last) { html += `<h2 class="she" id="she${g.she}">攝 ${esc(D.she[g.she])} <span class="n">${count[g.she]}</span></h2>`; last = g.she; }
+        if (g.sec !== last) {
+          if (head(g.sec) && head(g.sec) !== lastHead) { html += `<h2 class="sechead">${esc(head(g.sec))}</h2>`; lastHead = head(g.sec); }
+          html += `<h2 class="she" id="sec${g.sec}">${title(g.sec)} <span class="n">${count.get(g.sec)}</span></h2>`;
+          if (CATS[g.sec] && CATS[g.sec].k === 'homophone') html += '<p class="muted gsum">Every link in these groups is between homophones: more likely variant characters or homophonous synonyms than alternations.</p>';
+          last = g.sec;
+        }
         html += groupHtml(g, g.n);
       }
-      toc += Object.keys(count).map(s => `<a href="#she${s}" data-she="${s}">攝 ${esc(D.she[s])}<span class="n">${count[s]}</span></a>`).join('');
+      let th = null;
+      for (const [k, n] of count) {
+        if (head(k) && head(k) !== th) { toc += `<div class="toc-sub">${esc(head(k))}</div>`; th = head(k); }
+        toc += `<a href="#sec${k}" data-sec="${k}">${title(k)}<span class="n">${n}</span></a>`;
+      }
     } else {
       html += part.map(g => groupHtml(g, g.n)).join('');
       const sizes = {}; G.forEach(g => { sizes[g.m.length] = (sizes[g.m.length] || 0) + 1; });
@@ -158,10 +187,12 @@
     $('#gmain').innerHTML = html;
     $('#toc').innerHTML = toc;
     const m = $('#more'); if (m) m.onclick = () => { shown += PAGE; render(); };
-    $('#toc').querySelectorAll('a[data-she]').forEach(a => a.onclick = e => {
+    $('#toc').querySelectorAll('a[data-sec]').forEach(a => a.onclick = e => {
       // make sure the section is rendered before jumping to it
-      const idx = G.findIndex(g => g.she === +a.dataset.she);
-      if (idx >= shown) { e.preventDefault(); shown = idx + PAGE; render(); location.hash = ''; document.getElementById('she' + a.dataset.she).scrollIntoView(); }
+      e.preventDefault();
+      const idx = G.findIndex(g => g.sec === +a.dataset.sec);
+      if (idx >= shown) { shown = idx + PAGE; render(); }
+      const el = document.getElementById('sec' + a.dataset.sec); if (el) el.scrollIntoView();
     });
     const cp = $('#cpClose'); if (cp) cp.onclick = () => { history.replaceState(null, '', location.pathname); render(); };
   }
@@ -172,7 +203,7 @@
     const x = h && byChar.get(h);
     if (!h) return '';
     if (!x) return `<section class="cpanel"><p class="muted">${esc(h)}: no links (not in the rhyme tables, or nothing passes even the loosest thresholds). <button class="btn sm" id="cpClose">Close</button></p></section>`;
-    const L = linksOf[x.i].slice().sort((a, b) => b.p * (b.g + b.m) - a.p * (a.g + a.m));
+    const L = linksOf[x.i].slice().sort((a, b) => (b.ok - a.ok) || b.p * (b.g + b.m) - a.p * (a.g + a.m));
     const inModes = Object.entries(D.modes).map(([k, md]) => {
       const n = md.groups.findIndex(g => g.m.includes(x.i));
       return n < 0 ? '' : `<span class="alt">${esc(md.label)}: group ${n + 1}</span>`;
@@ -186,7 +217,7 @@
       ${L.map(l => { const y = CH[l.a === x.i ? l.b : l.a];
         return `<tr><td class="ch tg"><a class="cl" href="#ch=${encodeURIComponent(y.c)}">${esc(y.c)}</a></td><td class="r ghc">${tablesLink(y)}</td><td class="gl">${gloss(y)}</td>${linkCells(l)}</tr>`; }).join('')}
       </tbody></table>
-      <p class="muted">${L.length} phonetically related character${L.length === 1 ? '' : 's'} with character ≥ 0.20 or meaning ≥ 0.40.</p>
+      <p class="muted">${L.length} phonetically related character${L.length === 1 ? '' : 's'} with a meaning link, a compound, character ≥ 0.20 or embeddings ≥ 0.50; meaning links first.</p>
     </section>`;
   }
 
@@ -195,6 +226,6 @@
   let t = null;
   $('#q').oninput = () => { clearTimeout(t); t = setTimeout(() => { shown = PAGE; render(); }, 200); };
   window.onhashchange = () => { if (/(^#|&)ch=/.test(location.hash)) { render(); $('#gmain').scrollTop = 0; } };
-  fetch('data/groups.json?v=4').then(r => r.json()).then(d => { prep(d); render(); })
+  fetch('data/groups.json?v=5').then(r => r.json()).then(d => { prep(d); render(); })
     .catch(e => { console.error(e); $('#gmain').innerHTML = '<p class="muted">Could not load data/groups.json.</p>'; });
 })();
