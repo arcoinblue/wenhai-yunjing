@@ -1,0 +1,276 @@
+# Rime schema
+# encoding: utf-8
+#
+# 西夏文 · Downes 部首（寬） — Tangut by Downes radical code, reduced radicals accepted
+# Type a character's radical code (e.g. macanali or maca-nali for 𗀀). Hyphens are optional.
+# Several characters can be typed in a row. Press ` to look a character up by its GHC reading.
+
+schema:
+  schema_id: tangut_downes_reduced
+  name: "西夏 Downes 寬"
+  version: "1.0"
+  author:
+    - "Codes: Alan Downes, Xixia Dictionaries (2008)"
+    - "Data: arcoinblue/wenhai-yunjing"
+  description: |
+    Tangut input by Alan Downes's Recursive Radical Method with reduced radicals: any radical of the same
+    group is accepted in place of the one in the code.
+    Readings: Gong Hwang-cherng. ` + GHC spelling looks a character up by sound.
+  dependencies:
+    - tangut_ghc
+    - tangut_downes
+
+switches:
+  - name: ascii_mode
+    reset: 0
+    states: [ 西夏, ABC ]
+  - options: [ gloss_en, gloss_zh, gloss_none ]
+    reset: 0
+    states: [ "EN", "中", "—" ]
+  - name: full_shape
+    states: [ 半角, 全角 ]
+
+engine:
+  processors:
+    - ascii_composer
+    - recognizer
+    - key_binder
+    - speller
+    - punctuator
+    - selector
+    - navigator
+    - express_editor
+  segmentors:
+    - ascii_segmentor
+    - matcher
+    - abc_segmentor
+    - punct_segmentor
+    - fallback_segmentor
+  translators:
+    - punct_translator
+    - reverse_lookup_translator
+    - script_translator
+    - lua_translator@*tangut_complete@tangut_complete
+  filters:
+    - uniquifier
+    - lua_filter@*tangut_gloss@tangut_gloss
+
+speller:
+  alphabet: "abcdefghijklmnopqrstuvwxyz-"
+  initials: "abcdefghijklmnopqrstuvwxyz"
+  delimiter: " '-"
+  algebra:
+    # Each radical may be typed as any member of its reduced group
+    # (groups: tangut_v2.reduced, as on the Wenhai practice page).
+    - derive/^(baa|ba|be|bi|bo|bu)$/ba/
+    - derive/^(baa|ba|be|bi|bo|bu)$/be/
+    - derive/^(baa|ba|be|bi|bo|bu)$/bi/
+    - derive/^(baa|ba|be|bi|bo|bu)$/bo/
+    - derive/^(baa|ba|be|bi|bo|bu)$/bu/
+    - derive/^(baa|ba|be|bi|bo|bu)$/baa/
+    - derive/^(ca|cu)$/ca/
+    - derive/^(ca|cu)$/cu/
+    - derive/^(caa|cae|ci)$/ci/
+    - derive/^(caa|cae|ci)$/caa/
+    - derive/^(caa|cae|ci)$/cae/
+    - derive/^(cee|cii|coo|cuu|ce|co)$/ce/
+    - derive/^(cee|cii|coo|cuu|ce|co)$/co/
+    - derive/^(cee|cii|coo|cuu|ce|co)$/cee/
+    - derive/^(cee|cii|coo|cuu|ce|co)$/cii/
+    - derive/^(cee|cii|coo|cuu|ce|co)$/coo/
+    - derive/^(cee|cii|coo|cuu|ce|co)$/cuu/
+    - derive/^(fee|fii|foo|fuu|fae|fai|fau|fea|fa|fi|fo|fu)$/fa/
+    - derive/^(fee|fii|foo|fuu|fae|fai|fau|fea|fa|fi|fo|fu)$/fi/
+    - derive/^(fee|fii|foo|fuu|fae|fai|fau|fea|fa|fi|fo|fu)$/fo/
+    - derive/^(fee|fii|foo|fuu|fae|fai|fau|fea|fa|fi|fo|fu)$/fu/
+    - derive/^(fee|fii|foo|fuu|fae|fai|fau|fea|fa|fi|fo|fu)$/fee/
+    - derive/^(fee|fii|foo|fuu|fae|fai|fau|fea|fa|fi|fo|fu)$/fii/
+    - derive/^(fee|fii|foo|fuu|fae|fai|fau|fea|fa|fi|fo|fu)$/foo/
+    - derive/^(fee|fii|foo|fuu|fae|fai|fau|fea|fa|fi|fo|fu)$/fuu/
+    - derive/^(fee|fii|foo|fuu|fae|fai|fau|fea|fa|fi|fo|fu)$/fae/
+    - derive/^(fee|fii|foo|fuu|fae|fai|fau|fea|fa|fi|fo|fu)$/fai/
+    - derive/^(fee|fii|foo|fuu|fae|fai|fau|fea|fa|fi|fo|fu)$/fau/
+    - derive/^(fee|fii|foo|fuu|fae|fai|fau|fea|fa|fi|fo|fu)$/fea/
+    - derive/^(faa|fao|fe)$/fe/
+    - derive/^(faa|fao|fe)$/faa/
+    - derive/^(faa|fao|fe)$/fao/
+    - derive/^(gaa|gii|goo|gae|gai|gao|gea|gei|geo|geu|gia|gie|ga|go|gu)$/ga/
+    - derive/^(gaa|gii|goo|gae|gai|gao|gea|gei|geo|geu|gia|gie|ga|go|gu)$/go/
+    - derive/^(gaa|gii|goo|gae|gai|gao|gea|gei|geo|geu|gia|gie|ga|go|gu)$/gu/
+    - derive/^(gaa|gii|goo|gae|gai|gao|gea|gei|geo|geu|gia|gie|ga|go|gu)$/gaa/
+    - derive/^(gaa|gii|goo|gae|gai|gao|gea|gei|geo|geu|gia|gie|ga|go|gu)$/gii/
+    - derive/^(gaa|gii|goo|gae|gai|gao|gea|gei|geo|geu|gia|gie|ga|go|gu)$/goo/
+    - derive/^(gaa|gii|goo|gae|gai|gao|gea|gei|geo|geu|gia|gie|ga|go|gu)$/gae/
+    - derive/^(gaa|gii|goo|gae|gai|gao|gea|gei|geo|geu|gia|gie|ga|go|gu)$/gai/
+    - derive/^(gaa|gii|goo|gae|gai|gao|gea|gei|geo|geu|gia|gie|ga|go|gu)$/gao/
+    - derive/^(gaa|gii|goo|gae|gai|gao|gea|gei|geo|geu|gia|gie|ga|go|gu)$/gea/
+    - derive/^(gaa|gii|goo|gae|gai|gao|gea|gei|geo|geu|gia|gie|ga|go|gu)$/gei/
+    - derive/^(gaa|gii|goo|gae|gai|gao|gea|gei|geo|geu|gia|gie|ga|go|gu)$/geo/
+    - derive/^(gaa|gii|goo|gae|gai|gao|gea|gei|geo|geu|gia|gie|ga|go|gu)$/geu/
+    - derive/^(gaa|gii|goo|gae|gai|gao|gea|gei|geo|geu|gia|gie|ga|go|gu)$/gia/
+    - derive/^(gaa|gii|goo|gae|gai|gao|gea|gei|geo|geu|gia|gie|ga|go|gu)$/gie/
+    - derive/^(gee|guu|ge|gi)$/ge/
+    - derive/^(gee|guu|ge|gi)$/gi/
+    - derive/^(gee|guu|ge|gi)$/gee/
+    - derive/^(gee|guu|ge|gi)$/guu/
+    - derive/^(gau|gio)$/gau/
+    - derive/^(gau|gio)$/gio/
+    - derive/^(haa|ha|hi|ho|hu)$/ha/
+    - derive/^(haa|ha|hi|ho|hu)$/hi/
+    - derive/^(haa|ha|hi|ho|hu)$/ho/
+    - derive/^(haa|ha|hi|ho|hu)$/hu/
+    - derive/^(haa|ha|hi|ho|hu)$/haa/
+    - derive/^(hao|he)$/he/
+    - derive/^(hao|he)$/hao/
+    - derive/^(hii|hoo|hae|hai)$/hii/
+    - derive/^(hii|hoo|hae|hai)$/hoo/
+    - derive/^(hii|hoo|hae|hai)$/hae/
+    - derive/^(hii|hoo|hae|hai)$/hai/
+    - derive/^(muu|ma)$/ma/
+    - derive/^(muu|ma)$/muu/
+    - derive/^(mee|me)$/me/
+    - derive/^(mee|me)$/mee/
+    - derive/^(mii|moo|mo)$/mo/
+    - derive/^(mii|moo|mo)$/mii/
+    - derive/^(mii|moo|mo)$/moo/
+    - derive/^(laa|lii|la|li)$/la/
+    - derive/^(laa|lii|la|li)$/li/
+    - derive/^(laa|lii|la|li)$/laa/
+    - derive/^(laa|lii|la|li)$/lii/
+    - derive/^(lee|le)$/le/
+    - derive/^(lee|le)$/lee/
+    - derive/^(loo|lo|lu)$/lo/
+    - derive/^(loo|lo|lu)$/lu/
+    - derive/^(loo|lo|lu)$/loo/
+    - derive/^(naa|nee|nii|nae|ne)$/ne/
+    - derive/^(naa|nee|nii|nae|ne)$/naa/
+    - derive/^(naa|nee|nii|nae|ne)$/nee/
+    - derive/^(naa|nee|nii|nae|ne)$/nii/
+    - derive/^(naa|nee|nii|nae|ne)$/nae/
+    - derive/^(noo|nuu|nu)$/nu/
+    - derive/^(noo|nuu|nu)$/noo/
+    - derive/^(noo|nuu|nu)$/nuu/
+    - derive/^(paa|pee|pii)$/paa/
+    - derive/^(paa|pee|pii)$/pee/
+    - derive/^(paa|pee|pii)$/pii/
+    - derive/^(qe|qi)$/qe/
+    - derive/^(qe|qi)$/qi/
+    - derive/^(ra|re|ri|ro)$/ra/
+    - derive/^(ra|re|ri|ro)$/re/
+    - derive/^(ra|re|ri|ro)$/ri/
+    - derive/^(ra|re|ri|ro)$/ro/
+    - derive/^(tee|tii|tae|tei|tia|ta)$/ta/
+    - derive/^(tee|tii|tae|tei|tia|ta)$/tee/
+    - derive/^(tee|tii|tae|tei|tia|ta)$/tii/
+    - derive/^(tee|tii|tae|tei|tia|ta)$/tae/
+    - derive/^(tee|tii|tae|tei|tia|ta)$/tei/
+    - derive/^(tee|tii|tae|tei|tia|ta)$/tia/
+    - derive/^(too|tie|te)$/te/
+    - derive/^(too|tie|te)$/too/
+    - derive/^(too|tie|te)$/tie/
+    - derive/^(tai|tau|teu|ti)$/ti/
+    - derive/^(tai|tau|teu|ti)$/tai/
+    - derive/^(tai|tau|teu|ti)$/tau/
+    - derive/^(tai|tau|teu|ti)$/teu/
+    - derive/^(tao|to)$/to/
+    - derive/^(tao|to)$/tao/
+    - derive/^(taa|tuu|tea|teo|tu)$/tu/
+    - derive/^(taa|tuu|tea|teo|tu)$/taa/
+    - derive/^(taa|tuu|tea|teo|tu)$/tuu/
+    - derive/^(taa|tuu|tea|teo|tu)$/tea/
+    - derive/^(taa|tuu|tea|teo|tu)$/teo/
+    - derive/^(va|ve)$/va/
+    - derive/^(va|ve)$/ve/
+    - derive/^(wee|wa)$/wa/
+    - derive/^(wee|wa)$/wee/
+    - derive/^(wii|wo)$/wo/
+    - derive/^(wii|wo)$/wii/
+    - derive/^(waa|wu)$/wu/
+    - derive/^(waa|wu)$/waa/
+    - derive/^(xoo|xa)$/xa/
+    - derive/^(xoo|xa)$/xoo/
+    - derive/^(xaa|xee|xii|xae|xe)$/xe/
+    - derive/^(xaa|xee|xii|xae|xe)$/xaa/
+    - derive/^(xaa|xee|xii|xae|xe)$/xee/
+    - derive/^(xaa|xee|xii|xae|xe)$/xii/
+    - derive/^(xaa|xee|xii|xae|xe)$/xae/
+    - derive/^(xai|xao|xau|xea|xi)$/xi/
+    - derive/^(xai|xao|xau|xea|xi)$/xai/
+    - derive/^(xai|xao|xau|xea|xi)$/xao/
+    - derive/^(xai|xao|xau|xea|xi)$/xau/
+    - derive/^(xai|xao|xau|xea|xi)$/xea/
+    - derive/^(xuu|xu)$/xu/
+    - derive/^(xuu|xu)$/xuu/
+    - derive/^(ya|ye)$/ya/
+    - derive/^(ya|ye)$/ye/
+    - derive/^(za|ze|zo)$/za/
+    - derive/^(za|ze|zo)$/ze/
+    - derive/^(za|ze|zo)$/zo/
+
+translator:
+  dictionary: tangut_downes
+  prism: tangut_downes_reduced
+  enable_user_dict: true
+  preedit_format:
+    - "xform/ //"
+
+reverse_lookup:
+  dictionary: tangut_ghc
+  prism: tangut_ghc
+  prefix: "`"
+  suffix: "'"
+  tips: "〔GHC〕"
+  preedit_format:
+    - "xform/([aeiouyh][fc]*)n/$1N/"
+    - "xform/sx/ś/"
+    - "xform/zx/ź/"
+    - "xform/nx/ń/"
+    - "xform/ng/ŋ/"
+    - "xform/gh/ɣ/"
+    - "xform/eh/ə/"
+    - "xform/y/ɨ/"
+    - "xform/q/ꞏ/"
+    - "xform/f/̱/"
+    - "xform/c/̣/"
+    - "xform/N/̃/"
+    - "xform [;1] ¹"
+    - "xform [/2] ²"
+
+tangut_gloss:
+  show_ghc: true
+  show_code: false
+  show_code_reverse: true   # Downes code on ` (GHC) lookups
+  exact_first: true
+
+# characters whose code continues what has been typed
+tangut_complete:
+  reduced: true
+  limit: 300
+
+punctuator:
+  import_preset: default
+
+key_binder:
+  bindings:
+    - { when: paging, accept: comma, send: Page_Up }
+    - { when: has_menu, accept: period, send: Page_Down }
+    - { when: paging, accept: bracketleft, send: Page_Up }
+    - { when: has_menu, accept: bracketright, send: Page_Down }
+    - { when: has_menu, accept: Tab, send: Down }
+    - { when: has_menu, accept: Shift+Tab, send: Up }
+    - { when: always, accept: Control+period, toggle: ascii_punct }
+
+recognizer:
+  import_preset: default
+  patterns:
+    reverse_lookup: "`[a-z;/']*$"
+
+menu:
+  page_size: 9
+
+# Candidate window font (Squirrel and Weasel read this per schema).
+style:
+  font_face: "Noto Serif Tangut, BabelStone Tangut Wenhai, Tangut Yinchuan, PingFang SC, Microsoft YaHei"
+  font_point: 18
+  comment_font_face: "Helvetica Neue, Segoe UI, PingFang SC, Microsoft YaHei"
+  comment_font_point: 12
