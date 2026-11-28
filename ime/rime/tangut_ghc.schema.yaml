@@ -1,0 +1,145 @@
+# Rime schema
+# encoding: utf-8
+#
+# 西夏文 · 龔煌城擬音 — Tangut by Gong Hwang-cherng (GHC) reading
+#
+# Spelling (strict form; every mark may be left out):
+#   ś sx   ź zx   ń nx   ŋ ng   ɣ gh   ꞏ q   ɨ y   ə eh
+#   tense a̱ → af   retroflex ạ → ac   nasal ã → an
+#   tone ¹ → ;     tone ² → /
+#   e.g. tśhja̱¹ = tsxhjaf;   bjịj¹ = bjicj;   ŋwu² = ngwu/
+# ś and ź may also be typed sh, zh.  Words can be typed as one string: dodo, do;do/
+# Press ` to look a character up by its Downes radical code.
+
+schema:
+  schema_id: tangut_ghc
+  name: "西夏 GHC"
+  version: "1.0"
+  author:
+    - "Readings: Gong Hwang-cherng"
+    - "Data: arcoinblue/wenhai-yunjing"
+  description: |
+    Tangut input by Gong Hwang-cherng's reconstruction, with words.
+    ` + Downes radical code looks a character up by shape.
+  dependencies:
+    - tangut_downes
+
+switches:
+  - name: ascii_mode
+    reset: 0
+    states: [ 西夏, ABC ]
+  - options: [ gloss_en, gloss_zh, gloss_none ]
+    reset: 0
+    states: [ "EN", "中", "—" ]
+  - name: full_shape
+    states: [ 半角, 全角 ]
+
+engine:
+  processors:
+    - ascii_composer
+    - recognizer
+    - key_binder
+    - speller
+    - punctuator
+    - selector
+    - navigator
+    - express_editor
+  segmentors:
+    - ascii_segmentor
+    - matcher
+    - abc_segmentor
+    - punct_segmentor
+    - fallback_segmentor
+  translators:
+    - punct_translator
+    - reverse_lookup_translator
+    - script_translator
+    - lua_translator@*tangut_complete@tangut_complete
+  filters:
+    - uniquifier
+    - lua_filter@*tangut_gloss@tangut_gloss
+
+speller:
+  alphabet: "abcdefghijklmnopqrstuvwxyz;/"
+  initials: "abcdefghijklmnopqrstuvwxyz"
+  delimiter: " '"
+  algebra:
+    # dictionary codes are the strict spelling with tone digits 1/2
+    - derive/^(.+)[12]$/$1/          # tone optional
+    - derive/([aeiouyh][fc]*)n/$1/   # nasal mark optional
+    - derive/f//                     # tense mark optional
+    - derive/c//                     # retroflex mark optional
+    - derive/^q//                    # ꞏ optional
+    - derive/sx/sh/                  # ś as sh
+    - derive/zx/zh/                  # ź as zh
+    - derive/sx/s/
+    - derive/zx/z/
+    - derive/nx/n/
+    - derive/gh/g/
+    - derive/y/i/                    # ɨ as i
+    - derive/eh/e/                   # ə as e
+    - "xform 1$ ;"
+    - "xform 2$ /"
+
+translator:
+  dictionary: tangut_ghc
+  prism: tangut_ghc
+  enable_user_dict: true
+  preedit_format: &ghc_display
+    - "xform/([aeiouyh][fc]*)n/$1N/"
+    - "xform/sx/ś/"
+    - "xform/zx/ź/"
+    - "xform/nx/ń/"
+    - "xform/ng/ŋ/"
+    - "xform/gh/ɣ/"
+    - "xform/eh/ə/"
+    - "xform/y/ɨ/"
+    - "xform/q/ꞏ/"
+    - "xform/f/̱/"
+    - "xform/c/̣/"
+    - "xform/N/̃/"
+    - "xform [;1] ¹"
+    - "xform [/2] ²"
+
+reverse_lookup:
+  dictionary: tangut_downes
+  prism: tangut_downes
+  prefix: "`"
+  suffix: "'"
+  tips: "〔Downes〕"
+  preedit_format:
+    - "xform/ //"
+  comment_format: *ghc_display
+
+tangut_gloss:
+  show_ghc: false
+  show_code: true
+
+# with ` : characters whose Downes code continues what has been typed
+tangut_complete:
+  reduced: false
+  reverse_only: true
+  limit: 300
+
+punctuator:
+  import_preset: default
+  half_shape:
+    "/": "/"
+    ";": ";"
+
+key_binder:
+  import_preset: default
+
+recognizer:
+  import_preset: default
+  patterns:
+    reverse_lookup: "`[a-z'-]*$"
+
+menu:
+  page_size: 9
+
+style:
+  font_face: "Noto Serif Tangut, BabelStone Tangut Wenhai, Tangut Yinchuan, PingFang SC, Microsoft YaHei"
+  font_point: 18
+  comment_font_face: "Helvetica Neue, Segoe UI, PingFang SC, Microsoft YaHei"
+  comment_font_point: 12
